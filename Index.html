@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CropPilot — AI Field Intelligence</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8f2;
+      color: #18321f;
+    }
+
+    .app {
+      max-width: 480px;
+      min-height: 100vh;
+      margin: auto;
+      background: white;
+    }
+
+    header {
+      padding: 22px 20px;
+      background: linear-gradient(135deg, #14532d, #238636);
+      color: white;
+      border-radius: 0 0 24px 24px;
+    }
+
+    .brand {
+      font-size: 27px;
+      font-weight: 800;
+    }
+
+    .tagline {
+      margin-top: 5px;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .weather {
+      margin-top: 20px;
+      padding: 14px;
+      background: rgba(255,255,255,0.14);
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    main {
+      padding: 22px 18px 40px;
+    }
+
+    .location {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    .upload {
+      border: 2px dashed #86b98e;
+      border-radius: 20px;
+      padding: 35px 20px;
+      text-align: center;
+      background: #f7fbf6;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 45px;
+      margin-bottom: 10px;
+    }
+
+    .upload strong {
+      display: block;
+      font-size: 17px;
+    }
+
+    .upload span {
+      display: block;
+      color: #64748b;
+      font-size: 13px;
+      margin-top: 7px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .preview {
+      width: 100%;
+      border-radius: 18px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    label.crop-label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    select {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .analyze {
+      width: 100%;
+      margin-top: 22px;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: #15803d;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .analyze:active {
+      transform: scale(0.98);
+    }
+
+    .result {
+      display: none;
+      margin-top: 28px;
+    }
+
+    .alert {
+      padding: 18px;
+      border-radius: 16px;
+      background: #fff7ed;
+      border-left: 5px solid #f97316;
+    }
+
+    .confidence {
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    .bar {
+      height: 9px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: 91%;
+      height: 100%;
+      background: #16a34a;
+    }
+
+    .action {
+      margin-top: 15px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #ecfdf5;
+    }
+
+    .action h3 {
+      color: #166534;
+      margin-bottom: 8px;
+    }
+
+    .weather-warning {
+      margin-top: 15px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #fef2f2;
+      border-left: 5px solid #ef4444;
+    }
+
+    .next-window {
+      margin-top: 15px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #f0fdf4;
+      border-left: 5px solid #22c55e;
+    }
+
+    .small {
+      color: #64748b;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="brand">🌱 CropPilot</div>
+    <div class="tagline">From Field Signals to the Right Action</div>
+
+    <div class="weather">
+      <span>📍 Vijayawada</span>
+      <span>🌤️ 29°C</span>
+    </div>
+  </header>
+
+  <main>
+
+    <div class="location">
+      📍 Farm location detected
+    </div>
+
+    <h2>Scan your crop</h2>
+
+    <label class="upload">
+      <input type="file" id="photo" accept="image/*" capture="environment">
+      <div class="upload-icon">📷</div>
+      <strong>Take or upload a crop photo</strong>
+      <span>Clear photos give better results</span>
+    </label>
+
+    <img id="preview" class="preview" alt="Crop preview">
+
+    <label class="crop-label" for="crop">
+      Select crop
+    </label>
+
+    <select id="crop">
+      <option>Tomato</option>
+      <option>Rice</option>
+      <option>Chili</option>
+      <option>Potato</option>
+      <option>Cotton</option>
+    </select>
+
+    <button class="analyze" onclick="analyzeCrop()">
+      🔍 Analyze My Crop
+    </button>
+
+    <section class="result" id="result">
+
+      <div class="alert">
+        <h2>🔴 Likely Late Blight</h2>
+        <p>AI detected symptoms consistent with late blight.</p>
+
+        <div class="confidence">
+          Confidence: 91%
+        </div>
+
+        <div class="bar">
+          <div class="bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="action">
+        <h3>🌱 What to do now</h3>
+
+        <p>
+          Remove severely affected leaves and avoid overhead irrigation.
+          Follow locally approved agricultural disease-management guidance.
+        </p>
+      </div>
+
+      <div class="weather-warning">
+        <h3>🚫 Don't spray now</h3>
+
+        <p>
+          Rain is expected soon. Acting immediately may reduce treatment
+          effectiveness.
+        </p>
+      </div>
+
+      <div class="next-window">
+        <h3>🟢 Recommended action window</h3>
+
+        <p>
+          <strong>Tomorrow · 6:00–8:30 AM</strong>
+        </p>
+
+        <p class="small">
+          Rain probability: 9% · Wind: 6 km/h
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    CropPilot AI · Field intelligence for better decisions
+  </footer>
+
+</div>
+
+<script>
+  const photoInput = document.getElementById("photo");
+  const preview = document.getElementById("preview");
+
+  photoInput.addEventListener("change", function () {
+    const file = this.files[0];
+
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+    }
+  });
+
+  function analyzeCrop() {
+    document.getElementById("result").style.display = "block";
+
+    document.getElementById("result").scrollIntoView({
+      behavior: "smooth"
+    });
+  }
+</script>
+
+</body>
+          </html>
