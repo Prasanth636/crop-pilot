@@ -1,113 +1,713 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>CropPilot — AI Field Intelligence</title>
+<title>CropPilot — AI Field Intelligence</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+:root {
+  --bg: #f4f8f3;
+  --card: #ffffff;
+  --text: #18321f;
+  --muted: #64748b;
+  --primary: #15803d;
+  --primary-dark: #14532d;
+  --border: #dce8dd;
+  --soft: #f0fdf4;
+  --danger-bg: #fff1f2;
+  --warning-bg: #fff7ed;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f8f2;
-      color: #18321f;
-    }
+[data-theme="dark"] {
+  --bg: #0b1510;
+  --card: #142019;
+  --text: #e5f5e8;
+  --muted: #a8b7ad;
+  --primary: #22c55e;
+  --primary-dark: #166534;
+  --border: #294033;
+  --soft: #132a1b;
+  --danger-bg: #32191d;
+  --warning-bg: #332516;
+}
 
-    .app {
-      max-width: 480px;
-      min-height: 100vh;
-      margin: auto;
-      background: white;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    header {
-      padding: 22px 20px;
-      background: linear-gradient(135deg, #14532d, #238636);
-      color: white;
-      border-radius: 0 0 24px 24px;
-    }
+html {
+  scroll-behavior: smooth;
+}
 
-    .brand {
-      font-size: 27px;
-      font-weight: 800;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
 
-    .tagline {
-      margin-top: 5px;
-      font-size: 13px;
-      opacity: 0.85;
-    }
+button,
+select,
+input {
+  font: inherit;
+}
 
-    .weather {
-      margin-top: 20px;
-      padding: 14px;
-      background: rgba(255,255,255,0.14);
-      border-radius: 14px;
-      display: flex;
-      justify-content: space-between;
-    }
+.app {
+  min-height: 100vh;
+}
 
-    main {
-      padding: 22px 18px 40px;
-    }
+/* HEADER */
 
-    .location {
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 18px;
-    }
+header {
+  background: linear-gradient(135deg, #14532d, #15803d);
+  color: white;
+  padding: 22px;
+}
 
-    h2 {
-      font-size: 22px;
-      margin-bottom: 15px;
-    }
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+}
 
-    .upload {
-      border: 2px dashed #86b98e;
-      border-radius: 20px;
-      padding: 35px 20px;
-      text-align: center;
-      background: #f7fbf6;
-      cursor: pointer;
-    }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
 
-    .upload-icon {
-      font-size: 45px;
-      margin-bottom: 10px;
-    }
+.brand {
+  font-size: 27px;
+  font-weight: 800;
+}
 
-    .upload strong {
-      display: block;
-      font-size: 17px;
-    }
+.tagline {
+  margin-top: 5px;
+  font-size: 13px;
+  opacity: 0.85;
+}
 
-    .upload span {
-      display: block;
-      color: #64748b;
-      font-size: 13px;
-      margin-top: 7px;
-    }
+.theme-btn {
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.12);
+  color: white;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
 
-    input[type="file"] {
-      display: none;
-    }
+.weather {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255,255,255,0.13);
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
 
-    .preview {
-      width: 100%;
-      border-radius: 18px;
-      margin-top: 15px;
-      display: none;
-    }
+/* MAIN */
 
-    label.crop-label {
-      display: block;
-      margin-top: 20px;
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 28px 18px 50px;
+}
+
+.location {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+}
+
+h2 {
+  font-size: 23px;
+  margin-bottom: 16px;
+}
+
+h3 {
+  margin-bottom: 8px;
+}
+
+/* UPLOAD */
+
+.upload {
+  display: block;
+  border: 2px dashed #78a981;
+  border-radius: 20px;
+  padding: 38px 20px;
+  text-align: center;
+  background: var(--soft);
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.upload:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.upload-icon {
+  font-size: 46px;
+  margin-bottom: 10px;
+}
+
+.upload strong {
+  display: block;
+  font-size: 17px;
+}
+
+.upload span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 7px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.preview {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-top: 15px;
+  display: none;
+}
+
+/* FORM */
+
+.crop-label {
+  display: block;
+  margin-top: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+select {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--card);
+}
+
+.analyze {
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: var(--primary);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.analyze:hover {
+  transform: translateY(-2px);
+}
+
+/* STATUS */
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.status {
+  padding: 15px;
+  border-radius: 15px;
+  background: var(--soft);
+}
+
+.status-title {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.status-value {
+  font-size: 19px;
+  font-weight: 800;
+  margin-top: 5px;
+}
+
+/* RESULT */
+
+.result {
+  display: none;
+  margin-top: 22px;
+}
+
+.alert {
+  padding: 18px;
+  border-radius: 17px;
+  background: var(--warning-bg);
+  border-left: 5px solid #f97316;
+}
+
+.confidence {
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+.bar {
+  height: 9px;
+  background: #dce3de;
+  border-radius: 10px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  width: 91%;
+  height: 100%;
+  background: #16a34a;
+}
+
+.action,
+.next-window,
+.weather-warning,
+.evidence {
+  margin-top: 15px;
+  padding: 18px;
+  border-radius: 17px;
+}
+
+.action,
+.next-window,
+.evidence {
+  background: var(--soft);
+  border-left: 5px solid #22c55e;
+}
+
+.weather-warning {
+  background: var(--danger-bg);
+  border-left: 5px solid #ef4444;
+}
+
+.small {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.evidence ul {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.evidence li {
+  margin-bottom: 6px;
+}
+
+/* FOOTER */
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 25px;
+}
+
+/* TABLET */
+
+@media (min-width: 650px) {
+
+  main {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .status-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* LAPTOP */
+
+@media (min-width: 950px) {
+
+  header {
+    padding: 28px 40px;
+  }
+
+  main {
+    padding-top: 40px;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr 1.2fr;
+    align-items: start;
+  }
+
+  .brand {
+    font-size: 32px;
+  }
+
+  .card {
+    padding: 26px;
+  }
+}
+
+/* SMALL PHONE */
+
+@media (max-width: 400px) {
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .brand {
+    font-size: 23px;
+  }
+
+  .weather {
+    font-size: 13px;
+  }
+
+  main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="header-inner">
+
+    <div class="topbar">
+
+      <div>
+        <div class="brand">🌱 CropPilot</div>
+        <div class="tagline">
+          From Field Signals to the Right Action
+        </div>
+      </div>
+
+      <button class="theme-btn" onclick="toggleTheme()" id="themeButton">
+        🌙
+      </button>
+
+    </div>
+
+    <div class="weather">
+      <span>📍 Vijayawada</span>
+      <span>🌤️ 29°C</span>
+    </div>
+
+  </div>
+</header>
+
+<main>
+
+  <div class="location">
+    📍 Farm location detected
+  </div>
+
+  <div class="dashboard">
+
+    <!-- INPUT CARD -->
+
+    <section class="card">
+
+      <h2>Scan your crop</h2>
+
+      <label class="upload">
+
+        <input
+          type="file"
+          id="photo"
+          accept="image/*"
+          capture="environment"
+        >
+
+        <div class="upload-icon">📷</div>
+
+        <strong>
+          Take or upload a crop photo
+        </strong>
+
+        <span>
+          Clear photos give better analysis
+        </span>
+
+      </label>
+
+      <img
+        id="preview"
+        class="preview"
+        alt="Crop preview"
+      >
+
+      <label class="crop-label">
+        Select crop
+      </label>
+
+      <select id="crop">
+        <option>Tomato</option>
+        <option>Rice</option>
+        <option>Chili</option>
+        <option>Potato</option>
+        <option>Cotton</option>
+      </select>
+
+      <button class="analyze" onclick="analyzeCrop()">
+        🔍 Analyze My Crop
+      </button>
+
+    </section>
+
+    <!-- FIELD STATUS -->
+
+    <section class="card">
+
+      <h2>Field intelligence</h2>
+
+      <p class="small">
+        Current conditions around your farm
+      </p>
+
+      <div class="status-grid">
+
+        <div class="status">
+          <div class="status-title">Temperature</div>
+          <div class="status-value">29°C</div>
+        </div>
+
+        <div class="status">
+          <div class="status-title">Humidity</div>
+          <div class="status-value">76%</div>
+        </div>
+
+        <div class="status">
+          <div class="status-title">Rain risk</div>
+          <div class="status-value">24%</div>
+        </div>
+
+        <div class="status">
+          <div class="status-title">Wind</div>
+          <div class="status-value">8 km/h</div>
+        </div>
+
+      </div>
+
+      <div class="evidence" style="margin-top:20px">
+
+        <h3>🧠 How CropPilot works</h3>
+
+        <p class="small">
+          Crop image + location + weather signals are combined
+          to generate an actionable field advisory.
+        </p>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- RESULT -->
+
+  <section class="result" id="result">
+
+    <div class="card">
+
+      <h2>Field diagnosis</h2>
+
+      <div class="alert">
+
+        <h3>🔴 Likely Late Blight</h3>
+
+        <p>
+          AI detected symptoms consistent with late blight.
+        </p>
+
+        <div class="confidence">
+          Confidence: 91%
+        </div>
+
+        <div class="bar">
+          <div class="bar-fill"></div>
+        </div>
+
+      </div>
+
+      <div class="evidence">
+
+        <h3>🔎 Why CropPilot thinks this</h3>
+
+        <ul>
+          <li>Irregular brown lesions detected</li>
+          <li>Yellowing around affected areas</li>
+          <li>Leaf tissue damage detected</li>
+        </ul>
+
+      </div>
+
+      <div class="action">
+
+        <h3>🌱 What to do now</h3>
+
+        <p>
+          Remove severely affected leaves and avoid overhead
+          irrigation. Follow locally approved agricultural
+          disease-management guidance.
+        </p>
+
+      </div>
+
+      <div class="weather-warning">
+
+        <h3>🚫 Don't spray now</h3>
+
+        <p>
+          Rain is expected soon. Acting immediately may reduce
+          treatment effectiveness.
+        </p>
+
+      </div>
+
+      <div class="next-window">
+
+        <h3>🟢 Recommended action window</h3>
+
+        <p>
+          <strong>Tomorrow · 6:00–8:30 AM</strong>
+        </p>
+
+        <p class="small">
+          Rain probability: 9% · Wind: 6 km/h
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  CropPilot AI · Field intelligence for better decisions
+</footer>
+
+</div>
+
+<script>
+
+const photoInput = document.getElementById("photo");
+const preview = document.getElementById("preview");
+
+photoInput.addEventListener("change", function () {
+
+  const file = this.files[0];
+
+  if (file) {
+
+    preview.src = URL.createObjectURL(file);
+
+    preview.style.display = "block";
+
+  }
+
+});
+
+
+function analyzeCrop() {
+
+  const result = document.getElementById("result");
+
+  result.style.display = "block";
+
+  result.scrollIntoView({
+    behavior: "smooth"
+  });
+
+}
+
+
+function toggleTheme() {
+
+  const body = document.body;
+
+  const current =
+    body.getAttribute("data-theme");
+
+  if (current === "dark") {
+
+    body.removeAttribute("data-theme");
+
+    document.getElementById("themeButton").textContent = "🌙";
+
+    localStorage.setItem("cropPilotTheme", "light");
+
+  } else {
+
+    body.setAttribute("data-theme", "dark");
+
+    document.getElementById("themeButton").textContent = "☀️";
+
+    localStorage.setItem("cropPilotTheme", "dark");
+
+  }
+
+}
+
+
+const savedTheme =
+  localStorage.getItem("cropPilotTheme");
+
+if (savedTheme === "dark") {
+
+  document.body.setAttribute("data-theme", "dark");
+
+  document.getElementById("themeButton").textContent = "☀️";
+
+}
+
+</script>
+
+</body>
+</html>      margin-top: 20px;
       font-weight: 700;
       margin-bottom: 8px;
     }
