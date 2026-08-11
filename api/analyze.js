@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // Only allow POST
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
@@ -6,78 +7,116 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { image, mimeType, crop, language, field } = req.body;
+    const { image, crop, language, field } = req.body || {};
 
     if (!image) {
       return res.status(400).json({
-        error: "No crop image received"
+        error: "No crop image received."
       });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
+    if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
-        error: "GEMINI_API_KEY is not configured in Vercel"
+        error: "GEMINI_API_KEY is not configured in Vercel."
+      });
+    }
+
+    /*
+      The browser sends:
+      data:image/jpeg;base64,AAAA....
+
+      Gemini needs:
+      AAAA....
+
+      Remove the data URL prefix.
+    */
+
+    let base64Image = image;
+    let mimeType = "image/jpeg";
+
+    if (image.startsWith("data:")) {
+      const match = image.match(
+        /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/
+      );
+
+      if (!match) {
+        return res.status(400).json({
+          error: "Invalid image data format."
+        });
+      }
+
+      mimeType = match[1];
+      base64Image = match[2];
+    }
+
+    // Remove accidental whitespace/newlines
+    base64Image = base64Image
+      .replace(/\s/g, "")
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    // Basic Base64 validation
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64Image)) {
+      return res.status(400).json({
+        error: "Image Base64 data is invalid."
       });
     }
 
     const prompt = `
-You are CropPilot, an agricultural crop-health assistant.
+You are CropPilot, an agricultural field intelligence assistant.
 
-Analyze the supplied crop image.
+Analyze the provided crop image carefully.
 
-Crop:
+Crop selected:
 ${crop || "Unknown"}
 
-Language:
+Farmer language:
 ${language || "English"}
 
-Field conditions:
-Temperature: ${field?.temperature ?? "Unknown"}
-Humidity: ${field?.humidity ?? "Unknown"}
-Rain risk: ${field?.rain ?? "Unknown"}
-Wind: ${field?.wind ?? "Unknown"}
+Field information:
+Location: ${field?.place || "Unknown"}
+Temperature: ${field?.temperature ?? "Unknown"} °C
+Humidity: ${field?.humidity ?? "Unknown"} %
+Rain probability: ${field?.rain ?? "Unknown"} %
+Wind: ${field?.wind ?? "Unknown"} km/h
 
-Return ONLY valid JSON.
-Do not use markdown.
-Do not put the JSON inside code fences.
+Return a practical agricultural diagnosis.
 
-Use exactly this structure:
+Include:
+
+1. Crop health
+2. Likely disease, pest, nutrient deficiency, or healthy condition
+3. Confidence percentage
+4. Visible symptoms
+5. Recommended immediate action
+6. Prevention advice
+7. When to seek local agricultural expert help
+
+Do not pretend to be certain when the image is unclear.
+
+Give the answer in ${language || "English"}.
+
+Return ONLY valid JSON in this format:
 
 {
-  "diagnosis": "short disease or health diagnosis",
-  "description": "brief explanation",
+  "cropHealth": "Healthy / Warning / Diseased",
+  "diagnosis": "short diagnosis",
   "confidence": 0,
-  "why": [
-    "observation 1",
-    "observation 2",
-    "observation 3"
-  ],
-  "whatToDo": "practical action for the farmer",
-  "dontDo": "important action to avoid",
-  "actionWindow": "recommended timing",
-  "severity": "low"
+  "symptoms": "visible symptoms",
+  "immediateAction": "recommended action",
+  "prevention": "prevention advice",
+  "expertAdvice": "when to contact an agricultural expert"
 }
-
-The confidence must be a number from 0 to 100.
-
-Severity must be one of:
-low
-medium
-high
-
-Give practical agricultural guidance, but do not claim certainty when the image is unclear.
 `;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
-        encodeURIComponent(apiKey),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
       {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "x-goog-api-key": process.env.GEMINI_API_KEY
         },
 
         body: JSON.stringify({
@@ -89,8 +128,8 @@ Give practical agricultural guidance, but do not claim certainty when the image 
                 },
                 {
                   inline_data: {
-                    mime_type: mimeType || "image/jpeg",
-                    data: image
+                    mime_type: mimeType,
+                    data: base64Image
                   }
                 }
               ]
@@ -108,21 +147,24 @@ Give practical agricultural guidance, but do not claim certainty when the image 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Gemini error:", data);
+      console.error("Gemini API error:", data);
 
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "Gemini request failed"
+          "Gemini API request failed."
       });
     }
 
     const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      data?.candidates?.[0]?.content?.parts
+        ?.map(part => part.text || "")
+        .join("")
+        .trim();
 
     if (!text) {
       return res.status(500).json({
-        error: "Gemini returned no analysis"
+        error: "Gemini returned an empty response."
       });
     }
 
@@ -130,11 +172,12 @@ Give practical agricultural guidance, but do not claim certainty when the image 
 
     try {
       result = JSON.parse(text);
-    } catch {
-      console.error("Invalid Gemini JSON:", text);
+    } catch (error) {
+      console.error("Gemini JSON parse error:", text);
 
       return res.status(500).json({
-        error: "Gemini returned invalid JSON"
+        error: "Gemini returned invalid JSON.",
+        raw: text
       });
     }
 
@@ -144,7 +187,9 @@ Give practical agricultural guidance, but do not claim certainty when the image 
     console.error("Server error:", error);
 
     return res.status(500).json({
-      error: "AI analysis failed"
+      error:
+        error?.message ||
+        "Server error while analyzing crop."
     });
   }
 }
