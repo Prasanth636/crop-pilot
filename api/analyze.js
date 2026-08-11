@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
@@ -7,140 +6,220 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { image, mimeType, crop } = req.body || {};
+    const { image, crop, language } = req.body || {};
 
     if (!image) {
       return res.status(400).json({
-        error: "No crop image received"
+        error: "No image received."
       });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({
-        error: "AI service is not configured"
+    if (!crop) {
+      return res.status(400).json({
+        error: "Crop type is required."
       });
     }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "GEMINI_API_KEY is not configured in Vercel."
+      });
+    }
+
+    const match = image.match(
+      /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/
+    );
+
+    if (!match) {
+      return res.status(400).json({
+        error: "Invalid image format."
+      });
+    }
+
+    const mimeType = match[1];
+    const base64Data = match[2];
 
     const prompt = `
-You are CropPilot, an agricultural decision-support assistant.
+You are CropPilot, an agricultural crop-health assistant.
 
-Analyze the uploaded crop/leaf image.
+Analyze the supplied crop image.
 
-Selected crop:
-${crop || "Unknown"}
+Crop selected by farmer:
+${crop}
 
-Your job is to identify the most likely visible crop health issue.
+Respond in ${language || "English"}.
 
-IMPORTANT:
-- Do not pretend certainty.
-- If the image is unclear, say that the image is insufficient.
-- Do not invent a disease.
-- Give a confidence score from 0 to 100.
-- Explain the visible evidence.
-- Give practical, conservative next steps.
-- Do not recommend dangerous pesticide use or unsupported chemical dosages.
-- Encourage following local agricultural extension or label guidance for treatment.
-- This is decision support, not a replacement for an agronomist.
+Important:
+- Identify the most likely visible crop disease, pest, stress, or healthy condition.
+- Do NOT pretend certainty when the image is unclear.
+- Give a confidence percentage.
+- Give visible evidence.
+- Give practical immediate guidance.
+- Give a safety/timing warning.
+- Do not recommend dangerous pesticide quantities or unsupported chemical dosages.
+- If the image is not actually a crop/leaf image, clearly say so.
 
-Return ONLY valid JSON in this exact structure:
+Return ONLY valid JSON using exactly this structure:
 
 {
-  "crop": "string",
   "diagnosis": "string",
   "confidence": 0,
-  "severity": "Low | Moderate | High | Unclear",
-  "evidence": [
-    "string",
-    "string",
-    "string"
-  ],
-  "immediate_actions": [
-    "string",
-    "string",
-    "string"
-  ],
-  "avoid": [
-    "string",
-    "string"
-  ],
-  "needs_expert_review": true
+  "description": "string",
+  "evidence": ["string", "string", "string"],
+  "action": "string",
+  "warning": "string",
+  "action_window": "string"
 }
 `;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" +
-        encodeURIComponent(process.env.GEMINI_API_KEY),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
       {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey
         },
 
         body: JSON.stringify({
           contents: [
             {
+              role: "user",
+
               parts: [
                 {
-                  inline_data: {
-                    mime_type: mimeType || "image/jpeg",
-                    data: image
-                  }
+                  text: prompt
                 },
                 {
-                  text: prompt
+                  inline_data: {
+                    mime_type: mimeType,
+                    data: base64Data
+                  }
                 }
               ]
             }
           ],
 
           generationConfig: {
+            responseMimeType: "application/json",
+
+            responseSchema: {
+              type: "OBJECT",
+
+              properties: {
+                diagnosis: {
+                  type: "STRING"
+                },
+
+                confidence: {
+                  type: "NUMBER"
+                },
+
+                description: {
+                  type: "STRING"
+                },
+
+                evidence: {
+                  type: "ARRAY",
+                  items: {
+                    type: "STRING"
+                  }
+                },
+
+                action: {
+                  type: "STRING"
+                },
+
+                warning: {
+                  type: "STRING"
+                },
+
+                action_window: {
+                  type: "STRING"
+                }
+              },
+
+              required: [
+                "diagnosis",
+                "confidence",
+                "description",
+                "evidence",
+                "action",
+                "warning",
+                "action_window"
+              ]
+            },
+
             temperature: 0.2,
-            responseMimeType: "application/json"
+            maxOutputTokens: 1000
           }
         })
       }
     );
 
-    if (!response.ok) {
-      const errorText = await response.text();
 
-      console.error("Gemini error:", errorText);
+    const result = await response.json();
+
+
+    if (!response.ok) {
+
+      console.error(
+        "Gemini error:",
+        JSON.stringify(result)
+      );
 
       return res.status(502).json({
-        error: "AI analysis failed"
+        error:
+          result?.error?.message ||
+          "Gemini API request failed."
       });
     }
 
-    const data = await response.json();
 
     const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
 
     if (!text) {
+
       return res.status(502).json({
-        error: "AI returned no analysis"
+        error: "Gemini returned an empty response."
       });
     }
 
-    let result;
+
+    let parsed;
 
     try {
-      result = JSON.parse(text);
-    } catch {
+
+      parsed = JSON.parse(text);
+
+    } catch (error) {
+
+      console.error(
+        "JSON parse error:",
+        text
+      );
+
       return res.status(502).json({
-        error: "AI returned invalid analysis"
+        error: "Gemini returned invalid JSON."
       });
     }
 
-    return res.status(200).json(result);
+
+    return res.status(200).json(parsed);
 
   } catch (error) {
 
-    console.error("Server error:", error);
+    console.error(error);
 
     return res.status(500).json({
-      error: "Unexpected server error"
+      error:
+        error?.message ||
+        "Unexpected server error."
     });
   }
 }
