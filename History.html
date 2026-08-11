@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  name="theme-color"
+  content="#008f3d"
+>
+
+<meta
+  name="description"
+  content="CropPilot crop analysis history"
+>
+
+<title>CropPilot — History</title>
+
+<link
+  rel="stylesheet"
+  href="styles.css"
+>
+
+</head>
+
+
+<body>
+
+
+<a
+  class="skip-link"
+  href="#main"
+>
+  Skip to main content
+</a>
+
+
+<div class="app">
+
+
+<header class="hero">
+
+  <div class="top">
+
+    <a
+      href="index.html"
+      class="brand"
+    >
+
+      <span aria-hidden="true">🌱</span> CropPilot
+
+    </a>
+
+
+    <button
+      id="themeButton"
+      class="theme-button"
+      type="button"
+      aria-label="Switch theme"
+    >
+
+      🌙
+
+    </button>
+
+  </div>
+
+
+  <div class="tagline">
+    Your recent crop analyses
+  </div>
+
+</header>
+
+
+<nav
+  class="main-nav"
+  aria-label="Main navigation"
+>
+
+  <a href="index.html">
+    <span aria-hidden="true">🏠</span> Dashboard
+  </a>
+
+  <a href="scan.html">
+    <span aria-hidden="true">📷</span> Scan
+  </a>
+
+  <a
+    href="history.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">🗂️</span> History
+  </a>
+
+  <a href="field.html">
+    <span aria-hidden="true">📍</span> Field
+  </a>
+
+  <a href="guide.html">
+    <span aria-hidden="true">📘</span> Guide
+  </a>
+
+</nav>
+
+
+<div
+  id="liveStatus"
+  class="sr-only"
+  aria-live="polite"
+>
+</div>
+
+
+<main
+  id="main"
+  class="content"
+>
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    RECORDS
+  </div>
+
+  <h1>
+    Scan history
+  </h1>
+
+  <p class="muted">
+
+    Your recent CropPilot analyses
+    are stored locally on this device.
+
+  </p>
+
+
+  <div class="hero-actions">
+
+    <a
+      href="scan.html"
+      class="btn primary"
+    >
+
+      <span aria-hidden="true">📷</span> New Crop Scan
+
+    </a>
+
+
+    <button
+      id="clearHistory"
+      class="btn"
+      type="button"
+    >
+
+      <span aria-hidden="true">🗑️</span> Clear History
+
+    </button>
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <div
+    id="historyList"
+    class="history-list"
+  >
+
+    <div class="result">
+
+      <div class="result-title">
+
+        No scans yet
+
+      </div>
+
+      <p class="muted">
+
+        Your completed crop analyses
+        will appear here.
+
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+</main>
+
+
+<footer class="footer">
+
+  <strong>
+    <span aria-hidden="true">🌱</span> CropPilot AI
+  </strong>
+
+  <p>
+    History is stored locally in your browser.
+  </p>
+
+  <p>
+    AI advice should be verified with
+    local agricultural guidance.
+  </p>
+
+</footer>
+
+
+<nav
+  class="mobile-nav"
+  aria-label="Mobile navigation"
+>
+
+  <a href="index.html">
+
+    <span aria-hidden="true">🏠</span>
+    <span>Home</span>
+
+  </a>
+
+  <a href="scan.html">
+
+    <span aria-hidden="true">📷</span>
+    <span>Scan</span>
+
+  </a>
+
+  <a
+    href="history.html"
+    class="active"
+    aria-current="page"
+  >
+
+    <span aria-hidden="true">🗂️</span>
+    <span>History</span>
+
+  </a>
+
+  <a href="field.html">
+
+    <span aria-hidden="true">📍</span>
+    <span>Field</span>
+
+  </a>
+
+</nav>
+
+
+</div>
+
+
+<!--
+  Shared logic lives in app.js: theme toggling (initTheme),
+  and escapeHTML for safe rendering. Loaded as a module so its
+  exported functions are usable in the inline script below,
+  instead of duplicating that logic on this page.
+-->
+<script type="module" src="app.js"></script>
+
+<script type="module">
+
+"use strict";
+
+import { escapeHTML, initTheme } from "./app.js";
+
+
+function announceHistory(message) {
+
+  const el =
+    document.getElementById(
+      "liveStatus"
+    );
+
+  if (el) {
+    el.textContent = message;
+  }
+
+}
+
+
+function loadHistory() {
+
+  const container =
+    document.getElementById(
+      "historyList"
+    );
+
+
+  let history = [];
+
+
+  try {
+
+    history =
+      JSON.parse(
+        localStorage.getItem(
+          "cropPilotHistory"
+        ) || "[]"
+      );
+
+  }
+
+  catch {
+
+    history = [];
+
+  }
+
+
+  if (
+    !Array.isArray(history) ||
+    history.length === 0
+  ) {
+
+    container.innerHTML = `
+
+      <div class="result">
+
+        <div class="result-title">
+          No scans yet
+        </div>
+
+        <p class="muted">
+
+          Start your first crop scan
+          to create a field record.
+
+        </p>
+
+        <a
+          href="scan.html"
+          class="btn primary"
+        >
+
+          <span aria-hidden="true">📷</span> Start Scan
+
+        </a>
+
+      </div>
+
+    `;
+
+    announceHistory(
+      "No saved scans."
+    );
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    history.map(
+      item => {
+
+        const date =
+          item.date
+            ? new Date(
+                item.date
+              ).toLocaleString()
+            : "Unknown date";
+
+
+        const confidence =
+          Number(
+            item.confidence
+          ) || 0;
+
+
+        return `
+
+          <article class="history-item">
+
+            <div
+              class="history-icon"
+              aria-hidden="true"
+            >
+              🌱
+            </div>
+
+
+            <div class="history-content">
+
+              <strong>
+
+                ${escapeHTML(
+                  item.title ||
+                  "Crop analysis"
+                )}
+
+              </strong>
+
+
+              <div class="small muted">
+
+                ${escapeHTML(
+                  item.crop ||
+                  "Other"
+                )}
+
+                •
+
+                ${escapeHTML(
+                  date
+                )}
+
+              </div>
+
+
+              <p class="small">
+
+                ${escapeHTML(
+                  item.summary ||
+                  ""
+                )}
+
+              </p>
+
+            </div>
+
+
+            <div
+              class="badge"
+              aria-label="Confidence ${confidence} percent"
+            >
+
+              ${confidence}%
+
+            </div>
+
+          </article>
+
+        `;
+
+      }
+    )
+    .join("");
+
+
+  announceHistory(
+    `${history.length} saved scan${history.length === 1 ? "" : "s"} loaded.`
+  );
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    initTheme();
+
+    loadHistory();
+
+
+    const clear =
+      document.getElementById(
+        "clearHistory"
+      );
+
+
+    if (clear) {
+
+      clear.addEventListener(
+        "click",
+        () => {
+
+          const confirmed =
+            confirm(
+              "Delete all local crop history?"
+            );
+
+
+          if (!confirmed) {
+            return;
+          }
+
+
+          localStorage.removeItem(
+            "cropPilotHistory"
+          );
+
+
+          loadHistory();
+
+          announceHistory(
+            "History cleared."
+          );
+
+        }
+      );
+
+    }
+
+  }
+);
+
+</script>
+
+
+</body>
+
+</html>
