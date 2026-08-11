@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  name="theme-color"
+  content="#008f3d"
+>
+
+<meta
+  name="description"
+  content="Scan and analyze your crop with CropPilot"
+>
+
+<title>CropPilot — Crop Scan</title>
+
+<link
+  rel="stylesheet"
+  href="styles.css"
+>
+
+</head>
+
+
+<body>
+
+
+<a
+  class="skip-link"
+  href="#main"
+>
+  Skip to main content
+</a>
+
+
+<div class="app">
+
+
+<header class="hero">
+
+  <div class="top">
+
+    <a
+      href="index.html"
+      class="brand"
+    >
+
+      <span aria-hidden="true">🌱</span> CropPilot
+
+    </a>
+
+
+    <button
+      id="themeButton"
+      class="theme-button"
+      type="button"
+      aria-label="Switch theme"
+    >
+
+      🌙
+
+    </button>
+
+  </div>
+
+
+  <div class="tagline">
+    AI-powered crop analysis
+  </div>
+
+</header>
+
+
+<nav
+  class="main-nav"
+  aria-label="Main navigation"
+>
+
+  <a href="index.html">
+    <span aria-hidden="true">🏠</span> Dashboard
+  </a>
+
+  <a
+    href="scan.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">📷</span> Scan
+  </a>
+
+  <a href="history.html">
+    <span aria-hidden="true">🗂️</span> History
+  </a>
+
+  <a href="field.html">
+    <span aria-hidden="true">📍</span> Field
+  </a>
+
+  <a href="guide.html">
+    <span aria-hidden="true">📘</span> Guide
+  </a>
+
+</nav>
+
+
+<div
+  id="liveStatus"
+  class="sr-only"
+  aria-live="polite"
+>
+</div>
+
+
+<main
+  id="main"
+  class="content"
+>
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    CROP SCANNER
+  </div>
+
+  <h1>
+    Scan your crop
+  </h1>
+
+  <p class="muted">
+
+    Upload a clear plant photo.
+    CropPilot checks whether the
+    image is actually relevant before
+    generating an advisory.
+
+  </p>
+
+
+  <div class="upload-box">
+
+
+    <div class="camera-icon" aria-hidden="true">
+      📷
+    </div>
+
+
+    <h2>
+      Take or upload a crop photo
+    </h2>
+
+
+    <p class="muted">
+
+      Choose Camera or Gallery.
+
+    </p>
+
+
+    <div class="actions">
+
+
+      <button
+        id="cameraButton"
+        class="btn"
+        type="button"
+      >
+
+        <span aria-hidden="true">📷</span> Camera
+
+      </button>
+
+
+      <button
+        id="galleryButton"
+        class="btn"
+        type="button"
+      >
+
+        <span aria-hidden="true">🖼️</span> Gallery
+
+      </button>
+
+
+    </div>
+
+
+    <input
+      id="cameraInput"
+      class="file-input"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      aria-label="Take a crop photo with camera"
+    >
+
+
+    <input
+      id="galleryInput"
+      class="file-input"
+      type="file"
+      accept="image/*"
+      aria-label="Choose a crop photo from gallery"
+    >
+
+
+    <img
+      id="preview"
+      class="preview"
+      alt="Selected crop photo"
+      style="display:none"
+    >
+
+  </div>
+
+
+  <label>
+
+    <strong>
+      Select crop
+    </strong>
+
+
+    <select
+      id="crop"
+      class="select"
+    >
+
+      <option value="Tomato">
+        Tomato
+      </option>
+
+      <option value="Potato">
+        Potato
+      </option>
+
+      <option value="Rice">
+        Rice
+      </option>
+
+      <option value="Chilli">
+        Chilli
+      </option>
+
+      <option value="Cotton">
+        Cotton
+      </option>
+
+      <option value="Maize">
+        Maize
+      </option>
+
+      <option value="Groundnut">
+        Groundnut
+      </option>
+
+      <option value="Other">
+        Other
+      </option>
+
+    </select>
+
+  </label>
+
+
+  <label>
+
+    <strong>
+      Farmer language
+    </strong>
+
+
+    <select
+      id="language"
+      class="select"
+    >
+
+      <option value="English">
+        English
+      </option>
+
+      <option value="Telugu">
+        తెలుగు — Telugu
+      </option>
+
+      <option value="Hindi">
+        हिन्दी — Hindi
+      </option>
+
+      <option value="Tamil">
+        தமிழ் — Tamil
+      </option>
+
+      <option value="Kannada">
+        ಕನ್ನಡ — Kannada
+      </option>
+
+    </select>
+
+  </label>
+
+
+  <button
+    id="analyzeButton"
+    class="btn primary"
+    type="button"
+    disabled
+    style="
+      width:100%;
+      margin-top:15px;
+    "
+  >
+
+    <span aria-hidden="true">🔍</span> Analyze My Crop
+
+  </button>
+
+
+</section>
+
+
+<!-- FIELD -->
+
+<section class="card">
+
+  <div class="eyebrow">
+    FIELD CONTEXT
+  </div>
+
+  <h2>
+    Current conditions
+  </h2>
+
+  <p
+    id="farmLocation"
+    class="muted"
+  >
+
+    <span aria-hidden="true">📍</span> Detecting location...
+
+  </p>
+
+
+  <div class="stats">
+
+
+    <div class="stat">
+
+      <span>
+        Temperature
+      </span>
+
+      <strong id="temperature">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Humidity
+      </span>
+
+      <strong id="humidity">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Rain risk
+      </span>
+
+      <strong id="rain">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Wind
+      </span>
+
+      <strong id="wind">
+        --
+      </strong>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<!-- RESULT -->
+
+<section class="card">
+
+  <div class="eyebrow">
+    AI DIAGNOSIS
+  </div>
+
+  <h2>
+    Field diagnosis
+  </h2>
+
+  <p class="muted">
+
+    Your crop analysis will appear here.
+
+  </p>
+
+
+  <div
+    id="result"
+    class="result"
+  >
+
+    <div class="result-title">
+
+      Waiting for crop image
+
+    </div>
+
+
+    <div class="sub">
+
+      Add a crop photo and select
+      Analyze My Crop.
+
+    </div>
+
+
+    <div
+      class="progress"
+      role="progressbar"
+      aria-valuenow="0"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-label="Diagnosis confidence"
+    >
+
+      <div
+        class="progress-bar"
+        style="width:0%"
+      >
+      </div>
+
+    </div>
+
+
+    <div
+      class="sub"
+      style="margin-top:7px"
+    >
+
+      Confidence: --
+
+    </div>
+
+  </div>
+
+
+  <button
+    id="voiceButton"
+    class="btn"
+    type="button"
+    style="
+      width:100%;
+      margin-top:12px;
+    "
+  >
+
+    <span aria-hidden="true">🔊</span> Voice Advisory
+
+  </button>
+
+
+</section>
+
+
+</main>
+
+
+<footer class="footer">
+
+  <strong>
+    <span aria-hidden="true">🌱</span> CropPilot AI
+  </strong>
+
+  <p>
+    AI advice should be verified with
+    local agricultural guidance.
+  </p>
+
+</footer>
+
+
+<nav
+  class="mobile-nav"
+  aria-label="Mobile navigation"
+>
+
+  <a href="index.html">
+
+    <span aria-hidden="true">🏠</span>
+    <span>Home</span>
+
+  </a>
+
+  <a
+    href="scan.html"
+    class="active"
+    aria-current="page"
+  >
+
+    <span aria-hidden="true">📷</span>
+    <span>Scan</span>
+
+  </a>
+
+  <a href="history.html">
+
+    <span aria-hidden="true">🗂️</span>
+    <span>History</span>
+
+  </a>
+
+  <a href="field.html">
+
+    <span aria-hidden="true">📍</span>
+    <span>Field</span>
+
+  </a>
+
+</nav>
+
+
+</div>
+
+
+<script type="module" src="app.js"></script>
+
+</body>
+
+</html>
