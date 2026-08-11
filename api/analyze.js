@@ -1,225 +1,345 @@
-export default async function handler(req, res) {
+const MODEL = "gemini-2.5-flash";
+
+module.exports = async function handler(req, res) {
+
   if (req.method !== "POST") {
+
     return res.status(405).json({
-      error: "Method not allowed"
+      error: "POST only"
     });
+
   }
 
+
+  const apiKey =
+    process.env.GEMINI_API_KEY;
+
+
+  if (!apiKey) {
+
+    return res.status(500).json({
+
+      error:
+        "GEMINI_API_KEY is not configured in Vercel."
+
+    });
+
+  }
+
+
   try {
-    const { image, crop, language } = req.body || {};
 
-    if (!image) {
+    const body =
+      req.body || {};
+
+
+    const image =
+      body.image;
+
+    const crop =
+      body.crop || "Unknown";
+
+    const language =
+      body.language || "English";
+
+    const location =
+      body.location || "Unknown";
+
+    const weather =
+      body.weather || {};
+
+
+    if (
+      !image ||
+      !image.startsWith("data:image/")
+    ) {
+
       return res.status(400).json({
-        error: "No image received."
+
+        error:
+          "A crop image is required."
+
       });
+
     }
 
-    if (!crop) {
-      return res.status(400).json({
-        error: "Crop type is required."
-      });
-    }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const match =
+      image.match(
+        /^data:(image\/[^;]+);base64,(.+)$/
+      );
 
-    if (!apiKey) {
-      return res.status(500).json({
-        error: "GEMINI_API_KEY is not configured in Vercel."
-      });
-    }
-
-    const match = image.match(
-      /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/
-    );
 
     if (!match) {
+
       return res.status(400).json({
-        error: "Invalid image format."
+
+        error:
+          "Invalid image format."
+
       });
+
     }
 
-    const mimeType = match[1];
-    const base64Data = match[2];
+
+    const mimeType =
+      match[1];
+
+    const base64 =
+      match[2];
+
+
+    if (
+      base64.length >
+      12000000
+    ) {
+
+      return res.status(413).json({
+
+        error:
+          "Image is too large. Please choose a smaller photo."
+
+      });
+
+    }
+
 
     const prompt = `
-You are CropPilot, an agricultural crop-health assistant.
 
-Analyze the supplied crop image.
+You are CropPilot,
+an agricultural field-assistance AI.
 
-Crop selected by farmer:
+Analyze the supplied crop/leaf image
+together with crop type and field conditions.
+
+Crop:
 ${crop}
 
-Respond in ${language || "English"}.
+Farmer language:
+${language}
 
-Important:
-- Identify the most likely visible crop disease, pest, stress, or healthy condition.
-- Do NOT pretend certainty when the image is unclear.
-- Give a confidence percentage.
-- Give visible evidence.
-- Give practical immediate guidance.
-- Give a safety/timing warning.
-- Do not recommend dangerous pesticide quantities or unsupported chemical dosages.
-- If the image is not actually a crop/leaf image, clearly say so.
+Location:
+${location}
 
-Return ONLY valid JSON using exactly this structure:
+Temperature:
+${weather.temperature ?? "unknown"} °C
+
+Humidity:
+${weather.humidity ?? "unknown"} %
+
+Rain risk:
+${weather.rainRisk ?? "unknown"} %
+
+Wind:
+${weather.wind ?? "unknown"} km/h
+
+
+IMPORTANT:
+
+1. Do not claim certainty from an image alone.
+
+2. If the image is unclear or not a crop,
+say that a clearer crop photo is needed.
+
+3. Give practical and conservative advice.
+
+4. Do not invent pesticide products.
+
+5. Do not invent pesticide dosages.
+
+6. Treatment advice must follow
+locally approved agricultural guidance.
+
+7. Consider rain conditions before recommending spraying.
+
+8. Return ONLY valid JSON.
+
+Use this exact structure:
 
 {
-  "diagnosis": "string",
+  "diagnosis": "short diagnosis",
+  "severity": "healthy|low|moderate|high|severe|uncertain",
   "confidence": 0,
-  "description": "string",
-  "evidence": ["string", "string", "string"],
-  "action": "string",
-  "warning": "string",
-  "action_window": "string"
+  "summary": "one or two sentences",
+  "reason": "main visual evidence",
+  "action": "what the farmer should do now",
+  "treatment": "treatment or caution guidance",
+  "spray_now": true,
+  "action_window": "recommended timing",
+  "disclaimer": "short safety note"
 }
+
 `;
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
-      {
-        method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
+    const endpoint =
+      "https://generativelanguage.googleapis.com/" +
+      "v1beta/models/" +
+      MODEL +
+      ":generateContent";
 
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
 
-              parts: [
+    const response =
+      await fetch(
+        endpoint,
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "x-goog-api-key":
+              apiKey
+
+          },
+
+          body:
+            JSON.stringify({
+
+              contents: [
+
                 {
-                  text: prompt
-                },
-                {
-                  inline_data: {
-                    mime_type: mimeType,
-                    data: base64Data
-                  }
+
+                  role: "user",
+
+                  parts: [
+
+                    {
+                      text: prompt
+                    },
+
+                    {
+
+                      inline_data: {
+
+                        mime_type:
+                          mimeType,
+
+                        data:
+                          base64
+
+                      }
+
+                    }
+
+                  ]
+
                 }
-              ]
-            }
-          ],
 
-          generationConfig: {
-            responseMimeType: "application/json",
-
-            responseSchema: {
-              type: "OBJECT",
-
-              properties: {
-                diagnosis: {
-                  type: "STRING"
-                },
-
-                confidence: {
-                  type: "NUMBER"
-                },
-
-                description: {
-                  type: "STRING"
-                },
-
-                evidence: {
-                  type: "ARRAY",
-                  items: {
-                    type: "STRING"
-                  }
-                },
-
-                action: {
-                  type: "STRING"
-                },
-
-                warning: {
-                  type: "STRING"
-                },
-
-                action_window: {
-                  type: "STRING"
-                }
-              },
-
-              required: [
-                "diagnosis",
-                "confidence",
-                "description",
-                "evidence",
-                "action",
-                "warning",
-                "action_window"
-              ]
-            },
-
-            temperature: 0.2,
-            maxOutputTokens: 1000
-          }
-        })
-      }
-    );
+              ],
 
 
-    const result = await response.json();
+              generationConfig: {
+
+                temperature: 0.2,
+
+                maxOutputTokens: 1200,
+
+                responseMimeType:
+                  "application/json"
+
+              }
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
 
 
     if (!response.ok) {
 
-      console.error(
-        "Gemini error:",
-        JSON.stringify(result)
-      );
+      return res.status(
+        response.status
+      ).json({
 
-      return res.status(502).json({
         error:
-          result?.error?.message ||
+          data?.error?.message ||
           "Gemini API request failed."
+
       });
+
     }
 
 
     const text =
-      result?.candidates?.[0]?.content?.parts?.[0]?.text;
+      data
+        ?.candidates?.[0]
+        ?.content?.parts
+        ?.map(
+          part => part.text || ""
+        )
+        .join("")
+        .trim();
 
 
     if (!text) {
 
       return res.status(502).json({
-        error: "Gemini returned an empty response."
+
+        error:
+          "Gemini returned no analysis."
+
       });
+
     }
 
 
-    let parsed;
+    let result;
+
 
     try {
 
-      parsed = JSON.parse(text);
+      result =
+        JSON.parse(text);
 
-    } catch (error) {
+    }
 
-      console.error(
-        "JSON parse error:",
+    catch {
+
+      const cleaned =
         text
-      );
+          .replace(
+            /^```json\s*/i,
+            ""
+          )
+          .replace(
+            /```$/i,
+            ""
+          )
+          .trim();
 
-      return res.status(502).json({
-        error: "Gemini returned invalid JSON."
-      });
+
+      result =
+        JSON.parse(cleaned);
+
     }
 
 
-    return res.status(200).json(parsed);
+    return res.status(200).json(
+      result
+    );
 
-  } catch (error) {
+  }
+
+  catch (error) {
 
     console.error(error);
 
+
     return res.status(500).json({
+
       error:
-        error?.message ||
-        "Unexpected server error."
+        "Server error while analyzing the crop."
+
     });
+
   }
-}
+
+};
