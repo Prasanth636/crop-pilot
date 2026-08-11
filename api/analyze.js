@@ -1,347 +1,757 @@
 export default async function handler(req, res) {
+
   // =====================================================
-  // CROP PILOT - GEMINI CROP ANALYSIS API
+  // CROP PILOT - CROP IMAGE VALIDATION + AI ANALYSIS
   // =====================================================
 
-  // Only allow POST
+  // -----------------------------------------------------
+  // ONLY POST REQUESTS
+  // -----------------------------------------------------
+
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed"
     });
   }
 
+
   try {
+
     // ---------------------------------------------------
-    // READ REQUEST
+    // REQUEST DATA
     // ---------------------------------------------------
 
     const body = req.body || {};
 
     const image = body.image;
-    const crop = body.crop || "Unknown";
-    const language = body.language || "English";
-    const field = body.field || {};
+
+    const crop =
+      body.crop ||
+      "Unknown";
+
+    const language =
+      body.language ||
+      "English";
+
+    const field =
+      body.field ||
+      {};
+
 
     // ---------------------------------------------------
     // CHECK IMAGE
     // ---------------------------------------------------
 
-    if (!image || typeof image !== "string") {
+    if (
+      !image ||
+      typeof image !== "string"
+    ) {
+
       return res.status(400).json({
         error: "No crop image received."
       });
+
     }
 
+
     // ---------------------------------------------------
-    // CHECK API KEY
+    // GEMINI API KEY
     // ---------------------------------------------------
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey =
+      process.env.GEMINI_API_KEY;
+
 
     if (!apiKey) {
+
       return res.status(500).json({
-        error: "GEMINI_API_KEY is not configured in Vercel."
+        error:
+          "GEMINI_API_KEY is not configured in Vercel."
       });
+
     }
 
+
     // ---------------------------------------------------
-    // CONVERT DATA URL TO BASE64
+    // IMAGE DATA
     // ---------------------------------------------------
 
     let base64Image = image;
-    let mimeType = "image/jpeg";
 
-    if (image.startsWith("data:")) {
-      const match = image.match(
-        /^data:([^;]+);base64,(.+)$/
-      );
+    let mimeType =
+      "image/jpeg";
+
+
+    if (
+      image.startsWith("data:")
+    ) {
+
+      const match =
+        image.match(
+          /^data:([^;]+);base64,(.+)$/
+        );
+
 
       if (!match) {
+
         return res.status(400).json({
-          error: "Invalid image data format."
+          error:
+            "Invalid image data format."
         });
+
       }
 
-      mimeType = match[1];
-      base64Image = match[2];
+
+      mimeType =
+        match[1];
+
+      base64Image =
+        match[2];
+
     }
 
-    // Remove accidental whitespace/newlines
-    base64Image = base64Image.replace(/\s/g, "");
+
+    // Remove spaces/newlines
+    base64Image =
+      base64Image.replace(
+        /\s/g,
+        ""
+      );
+
 
     // ---------------------------------------------------
-    // VALIDATE MIME TYPE
+    // ALLOWED IMAGE TYPES
     // ---------------------------------------------------
 
     const allowedTypes = [
+
       "image/jpeg",
+
       "image/png",
+
       "image/webp",
+
       "image/heic",
+
       "image/heif"
+
     ];
 
-    if (!allowedTypes.includes(mimeType)) {
+
+    if (
+      !allowedTypes.includes(
+        mimeType
+      )
+    ) {
+
       return res.status(400).json({
-        error: "Unsupported image type: " + mimeType
+        error:
+          "Unsupported image type: " +
+          mimeType
       });
+
     }
 
+
     // ---------------------------------------------------
-    // BUILD FIELD INFORMATION
+    // FIELD DATA
     // ---------------------------------------------------
 
     const place =
       field.place ||
       "Unknown location";
 
+
     const temperature =
       field.temperature ??
       "Unknown";
+
 
     const humidity =
       field.humidity ??
       "Unknown";
 
+
     const rain =
       field.rain ??
       "Unknown";
+
 
     const wind =
       field.wind ??
       "Unknown";
 
-    // ---------------------------------------------------
-    // LANGUAGE INSTRUCTION
-    // ---------------------------------------------------
 
-    const languageInstruction = `
-Return the final farmer advisory in ${language}.
+    // ===================================================
+    // IMPORTANT:
+    // FIRST VALIDATE WHETHER IMAGE IS A CROP PHOTO
+    // ===================================================
 
-Use simple language that an ordinary farmer can understand.
+    const validationPrompt = `
 
-Do not answer in English unless the selected language is English.
+You are the image validation system for CropPilot,
+an agricultural crop-health application.
 
-Do not translate crop names unnecessarily.
+Your ONLY job is to determine whether the supplied
+image is suitable for crop or plant health analysis.
 
-Keep the advice practical and safe.
+The image MUST visibly contain:
+
+- a crop plant
+- a leaf
+- stem
+- fruit
+- vegetable plant
+- agricultural field
+- crop disease symptoms
+- crop pest damage
+- or another clearly agricultural plant subject
+
+A valid image can be:
+
+- close-up leaf photo
+- whole crop plant
+- agricultural field
+- damaged leaf
+- diseased plant
+- fruit or vegetable growing on a plant
+
+An INVALID image includes:
+
+- people
+- faces
+- clothing
+- beds
+- furniture
+- rooms
+- buildings
+- vehicles
+- animals that are not part of crop context
+- screenshots
+- documents
+- food dishes
+- random objects
+- scenery without crops
+- completely unrelated photographs
+
+Do NOT assume that an image is a crop just because
+the farmer selected a crop name.
+
+Selected crop:
+${crop}
+
+Return EXACTLY one line:
+
+VALID_CROP: YES
+
+or
+
+VALID_CROP: NO
+
+Do not return anything else.
 `;
 
+
     // ---------------------------------------------------
-    // GEMINI PROMPT
+    // VALIDATION REQUEST
     // ---------------------------------------------------
 
-    const prompt = `
-You are CropPilot, an agricultural crop-health assistant.
+    const validationUrl =
+      "https://generativelanguage.googleapis.com/v1beta/" +
+      "models/gemini-3.6-flash:generateContent";
 
-Analyze the supplied crop image carefully.
 
-Crop selected by farmer:
+    const validationResponse =
+      await fetch(
+        validationUrl,
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "x-goog-api-key":
+              apiKey
+
+          },
+
+          body: JSON.stringify({
+
+            contents: [
+
+              {
+
+                role: "user",
+
+                parts: [
+
+                  {
+                    inline_data: {
+                      mime_type:
+                        mimeType,
+
+                      data:
+                        base64Image
+                    }
+                  },
+
+                  {
+                    text:
+                      validationPrompt
+                  }
+
+                ]
+
+              }
+
+            ]
+
+          })
+
+        }
+      );
+
+
+    const validationText =
+      await validationResponse.text();
+
+
+    let validationData;
+
+
+    try {
+
+      validationData =
+        JSON.parse(
+          validationText
+        );
+
+    } catch {
+
+      return res.status(502).json({
+        error:
+          "Gemini returned an invalid validation response."
+      });
+
+    }
+
+
+    // ---------------------------------------------------
+    // GEMINI VALIDATION ERROR
+    // ---------------------------------------------------
+
+    if (
+      !validationResponse.ok
+    ) {
+
+      console.error(
+        "Gemini validation error:",
+        validationData
+      );
+
+
+      return res.status(502).json({
+
+        error:
+          validationData?.error?.message ||
+          "Image validation failed."
+
+      });
+
+    }
+
+
+    // ---------------------------------------------------
+    // GET VALIDATION TEXT
+    // ---------------------------------------------------
+
+    const validationParts =
+      validationData
+        ?.candidates?.[0]
+        ?.content?.parts ||
+      [];
+
+
+    const validationResult =
+      validationParts
+        .map(
+          part =>
+            part?.text || ""
+        )
+        .join(" ")
+        .trim();
+
+
+    console.log(
+      "Crop validation:",
+      validationResult
+    );
+
+
+    // ===================================================
+    // REJECT RANDOM IMAGE
+    // ===================================================
+
+    if (
+      !validationResult
+        .toUpperCase()
+        .includes(
+          "VALID_CROP: YES"
+        )
+    ) {
+
+      return res.status(200).json({
+
+        success: true,
+
+        isCropImage: false,
+
+        analysis:
+
+          "This image does not appear to contain a crop or plant suitable for agricultural analysis.",
+
+        confidence: 0,
+
+        diagnosis:
+          "Invalid crop image",
+
+        action:
+          "Please upload a clear photo of your crop, leaf, stem, fruit, or agricultural field.",
+
+        prevention:
+          "Take the photo in good lighting and make sure the crop occupies most of the image.",
+
+        crop:
+          crop,
+
+        language:
+          language
+
+      });
+
+    }
+
+
+    // ===================================================
+    // IMAGE IS A CROP
+    // NOW PERFORM AGRICULTURAL ANALYSIS
+    // ===================================================
+
+    const analysisPrompt = `
+
+You are CropPilot, an agricultural crop-health
+analysis assistant.
+
+The image has already passed the CropPilot
+crop-image validation system.
+
+Analyze ONLY the agricultural subject visible
+in the image.
+
+Selected crop:
 ${crop}
 
 Farm location:
 ${place}
 
 Current field conditions:
-Temperature: ${temperature} °C
-Humidity: ${humidity} %
-Rain probability: ${rain} %
-Wind: ${wind} km/h
 
-${languageInstruction}
+Temperature:
+${temperature} °C
 
-Give a concise but useful crop-health diagnosis.
+Humidity:
+${humidity} %
 
-Return the answer using exactly these sections:
+Rain probability:
+${rain} %
+
+Wind:
+${wind} km/h
+
+
+LANGUAGE:
+
+Return the complete farmer advisory in:
+
+${language}
+
+
+IMPORTANT:
+
+Use simple language suitable for farmers.
+
+Do not claim a disease with certainty unless
+the image clearly supports it.
+
+If the image is a healthy plant, say that it
+appears healthy.
+
+If symptoms are visible, identify the most
+likely condition.
+
+If the image quality is insufficient, clearly
+say that a reliable diagnosis cannot be made.
+
+
+Return EXACTLY these sections:
 
 DIAGNOSIS:
-Identify the likely crop health condition visible in the image.
+Give the likely crop health condition.
 
 CONFIDENCE:
-Give a confidence percentage from 0 to 100.
+Give a percentage from 0 to 100.
 
 SYMPTOMS:
-List the important visible symptoms.
+Describe the visible symptoms.
 
 LIKELY CAUSE:
 Explain the most likely cause.
 
-ACTION:
-Give practical immediate actions the farmer can take.
+RECOMMENDED ACTION:
+Give practical next steps.
 
 PREVENTION:
 Give practical prevention advice.
 
 CAUTION:
-If the image is unclear or the diagnosis cannot be determined reliably,
-say so clearly. Do not invent a disease.
+Mention uncertainty or the need for local
+agricultural confirmation when appropriate.
 
-Important:
-- Do not claim certainty when the image does not support it.
-- Do not recommend dangerous chemicals.
-- If pesticide/fungicide treatment may be appropriate, advise the farmer
-  to follow the locally registered product label and local agricultural
-  guidance.
-- Keep the response farmer-friendly.
+
+IMPORTANT SAFETY:
+
+Do not recommend dangerous chemicals.
+
+If pesticide or fungicide treatment could be
+appropriate, tell the farmer to follow the
+locally registered product label and local
+agricultural guidance.
+
+Do not invent symptoms that are not visible.
 `;
 
+
     // ---------------------------------------------------
-    // GEMINI API REQUEST
+    // ANALYSIS REQUEST
     // ---------------------------------------------------
 
-    const geminiUrl =
-      "https://generativelanguage.googleapis.com/v1beta/" +
-      "models/gemini-3.6-flash:generateContent";
+    const analysisResponse =
+      await fetch(
+        validationUrl,
+        {
 
-    const geminiResponse = await fetch(
-      geminiUrl,
-      {
-        method: "POST",
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
+          headers: {
 
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
+            "Content-Type":
+              "application/json",
 
-              parts: [
-                {
-                  inline_data: {
-                    mime_type: mimeType,
-                    data: base64Image
+            "x-goog-api-key":
+              apiKey
+
+          },
+
+          body: JSON.stringify({
+
+            contents: [
+
+              {
+
+                role: "user",
+
+                parts: [
+
+                  {
+                    inline_data: {
+                      mime_type:
+                        mimeType,
+
+                      data:
+                        base64Image
+                    }
+                  },
+
+                  {
+                    text:
+                      analysisPrompt
                   }
-                },
 
-                {
-                  text: prompt
-                }
-              ]
-            }
-          ]
-        })
-      }
-    );
+                ]
 
-    // ---------------------------------------------------
-    // READ GEMINI RESPONSE
-    // ---------------------------------------------------
+              }
 
-    const responseText =
-      await geminiResponse.text();
+            ]
 
-    let data;
+          })
 
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return res.status(502).json({
-        error: "Gemini returned an invalid response.",
-        details: responseText.substring(0, 500)
-      });
-    }
-
-    // ---------------------------------------------------
-    // GEMINI ERROR
-    // ---------------------------------------------------
-
-    if (!geminiResponse.ok) {
-      console.error(
-        "Gemini API error:",
-        data
+        }
       );
 
-      const message =
-        data?.error?.message ||
-        "Gemini analysis failed.";
+
+    const analysisText =
+      await analysisResponse.text();
+
+
+    let analysisData;
+
+
+    try {
+
+      analysisData =
+        JSON.parse(
+          analysisText
+        );
+
+    } catch {
 
       return res.status(502).json({
-        error: message
+
+        error:
+          "Gemini returned an invalid analysis response."
+
       });
+
     }
 
+
     // ---------------------------------------------------
-    // EXTRACT TEXT
+    // ANALYSIS ERROR
     // ---------------------------------------------------
 
-    const candidates =
-      data?.candidates || [];
+    if (
+      !analysisResponse.ok
+    ) {
 
-    if (!candidates.length) {
+      console.error(
+        "Gemini analysis error:",
+        analysisData
+      );
+
+
       return res.status(502).json({
-        error: "Gemini returned no analysis."
+
+        error:
+          analysisData?.error?.message ||
+          "Crop analysis failed."
+
       });
+
     }
 
-    const parts =
-      candidates[0]?.content?.parts || [];
+
+    // ---------------------------------------------------
+    // EXTRACT ANALYSIS
+    // ---------------------------------------------------
+
+    const analysisParts =
+      analysisData
+        ?.candidates?.[0]
+        ?.content?.parts ||
+      [];
+
 
     const text =
-      parts
-        .map(part => part?.text || "")
+      analysisParts
+        .map(
+          part =>
+            part?.text || ""
+        )
         .join("\n")
         .trim();
 
+
     if (!text) {
+
       return res.status(502).json({
-        error: "Gemini returned an empty analysis."
+
+        error:
+          "Gemini returned an empty crop analysis."
+
       });
+
     }
 
+
     // ---------------------------------------------------
-    // EXTRACT CONFIDENCE
+    // CONFIDENCE
     // ---------------------------------------------------
 
     let confidence = null;
+
 
     const confidenceMatch =
       text.match(
         /CONFIDENCE\s*:\s*(\d{1,3})\s*%/i
       );
 
+
     if (confidenceMatch) {
+
       confidence =
         Math.min(
           100,
+
           Math.max(
             0,
-            Number(confidenceMatch[1])
+
+            Number(
+              confidenceMatch[1]
+            )
+
           )
+
         );
+
     }
 
+
     // ---------------------------------------------------
-    // RETURN SUCCESS
+    // RETURN RESULT
     // ---------------------------------------------------
 
     return res.status(200).json({
+
       success: true,
+
+      isCropImage: true,
 
       analysis: text,
 
-      confidence: confidence,
+      confidence:
+        confidence,
 
-      crop: crop,
+      crop:
+        crop,
 
-      language: language,
+      language:
+        language,
 
-      model: "gemini-3.6-flash"
+      model:
+        "gemini-3.6-flash"
+
     });
+
 
   } catch (error) {
 
     console.error(
-      "CropPilot API error:",
+      "CropPilot server error:",
       error
     );
 
+
     return res.status(500).json({
+
       error:
         error?.message ||
         "Unexpected server error."
+
     });
+
   }
+
 }
