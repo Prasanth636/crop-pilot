@@ -1,113 +1,444 @@
+const MODEL = "gemini-3.1-flash-lite";
+
+const MAX_IMAGE_BYTES = 7500000;
+const MAX_REQUESTS_PER_MINUTE = 8;
+const RATE_LOG_MAX_ENTRIES = 500;
+const FETCH_TIMEOUT_MS = 15000;
+
+const requestLog = new Map();
+
+const ALLOWED_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp"
+]);
+
+function sendJSON(res, status, data) {
+  res.status(status);
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  return res.end(JSON.stringify(data));
+}
+
+/* =========================
+   RATE LIMIT
+========================= */
+
+function checkRateLimit(req) {
+  const forwarded = String(req.headers?.["x-forwarded-for"] || "");
+  const ip = forwarded.split(",")[0].trim() || "unknown";
+  const now = Date.now();
+
+  const old = requestLog.get(ip) || [];
+  const active = old.filter(time => now - time < 60000);
+
+  if (active.length >= MAX_REQUESTS_PER_MINUTE) {
+    return false;
+  }
+
+  active.push(now);
+  requestLog.set(ip, active);
+
+  // Prevent unbounded memory growth: prune IPs with no recent activity
+  // once the map gets large, instead of letting it grow forever.
+  if (requestLog.size > RATE_LOG_MAX_ENTRIES) {
+    for (const [key, times] of requestLog) {
+      if (times.every(t => now - t >= 60000)) {
+        requestLog.delete(key);
+      }
+    }
+  }
+
+  return true;
+}
+
+/* =========================
+   IMAGE VALIDATION
+========================= */
+
+export function parseImage(value) {
+  if (typeof value !== "string") {
+    throw new Error("Image is required.");
+  }
+
+  if (value.length > MAX_IMAGE_BYTES * 1.4) {
+    throw new Error("Image is too large.");
+  }
+
+  const match = value.match(
+    /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/i
+  );
+
+  if (!match) {
+    throw new Error("Please upload a JPG, PNG or WebP image.");
+  }
+
+  const mimeType = match[1].toLowerCase();
+  const base64 = match[2].replace(/\s/g, "");
+  const estimatedBytes = Math.floor(base64.length * 0.75);
+
+  if (!ALLOWED_MIME.has(mimeType)) {
+    throw new Error("Unsupported image type.");
+  }
+
+  if (estimatedBytes > MAX_IMAGE_BYTES) {
+    throw new Error("Image is too large.");
+  }
+
+  return {
+    mime_type: mimeType,
+    data: base64
+  };
+}
+
+/* =========================
+   CONFIDENCE
+========================= */
+
+export function clampConfidence(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(number)));
+}
+
+/* =========================
+   GEMINI SCHEMA
+========================= */
+
+function responseSchema() {
+  return {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      is_crop: { type: "boolean" },
+      crop_match: { type: "boolean" },
+      title: { type: "string" },
+      summary: { type: "string" },
+      reason: { type: "string" },
+      severity: {
+        type: "string",
+        enum: ["Healthy", "Watch", "Concern", "Unknown"]
+      },
+      confidence: { type: "integer", minimum: 0, maximum: 100 },
+      action: { type: "string" },
+      prevention: { type: "string" }
+    },
+    required: [
+      "is_crop",
+      "crop_match",
+      "title",
+      "summary",
+      "reason",
+      "severity",
+      "confidence",
+      "action",
+      "prevention"
+    ]
+  };
+}
+
+/* =========================
+   CLEAN INPUT
+========================= */
+
+function clean(value, max) {
+  return String(value ?? "").trim().slice(0, max);
+}
+
+/* =========================
+   AI PROMPT
+========================= */
+
+function buildPrompt({ crop, language, field }) {
+  return `
+
+You are CropPilot, a cautious agricultural visual triage assistant.
+
+Your job is to analyze the uploaded image and provide a practical farmer advisory.
+
+IMPORTANT DECISION RULES:
+
+1. FIRST determine whether the image actually contains:
+   - crop
+   - plant
+   - leaf
+   - fruit
+   - stem
+   - agricultural vegetation
+
+2. If the image is NOT a crop or plant image:
+   is_crop=false
+   severity="Unknown"
+   confidence must be 15 or lower.
+   Do NOT invent a crop diagnosis.
+
+3. Compare the image with the selected crop:
+   ${crop}
+
+4. If the selected crop does not reasonably match the image:
+   crop_match=false.
+   Explain that the farmer should verify the selected crop.
+
+5. Never invent symptoms.
+
+6. Only describe visual evidence that can reasonably be observed.
+
+7. If the image quality is poor or evidence is insufficient:
+   use severity="Unknown" or "Watch".
+
+8. Weather conditions are supporting context only.
+   They are NOT proof of disease.
+
+9. Do NOT prescribe pesticide brands, chemical mixtures or unsafe dosage instructions.
+
+10. Give simple, practical farmer-friendly advice.
+
+11. Write the answer in:
+   ${language}
+
+12. Return ONLY valid JSON matching the supplied schema.
+
+SELECTED CROP:
+${crop}
+
+LOCATION:
+${clean(field.place, 100) || "Unknown"}
+
+TEMPERATURE:
+${field.temperature ?? "Unknown"} °C
+
+HUMIDITY:
+${field.humidity ?? "Unknown"} %
+
+RAIN RISK:
+${field.rain ?? "Unknown"} %
+
+WIND:
+${field.wind ?? "Unknown"} km/h
+
+The response must contain:
+
+- whether this is a crop image
+- whether selected crop matches
+- short title
+- farmer-friendly summary
+- reason
+- severity
+- confidence
+- recommended action
+- prevention
+
+`;
+}
+
+/* =========================
+   GEMINI REQUEST
+   (fetchImpl is injectable so tests can mock the network call)
+========================= */
+
+export async function analyzeWithGemini({
+  apiKey,
+  image,
+  crop,
+  language,
+  field,
+  fetchImpl = fetch
+}) {
+  const prompt = buildPrompt({ crop, language, field });
+
+  const payload = {
+    contents: [
+      {
+        role: "user",
+        parts: [
+          { text: prompt },
+          { inline_data: image }
+        ]
+      }
+    ],
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: responseSchema(),
+      temperature: 0.2
+    }
+  };
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  let response;
+
+  try {
+    response = await fetchImpl(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      }
+    );
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("Analysis timed out. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  const raw = await response.text();
+
+  let data = null;
+
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.error?.message || "Gemini request failed.");
+  }
+
+  const text = data
+    ?.candidates
+    ?.[0]
+    ?.content
+    ?.parts
+    ?.find(part => typeof part.text === "string")
+    ?.text;
+
+  if (!text) {
+    throw new Error("Gemini returned no analysis.");
+  }
+
+  let result;
+
+  try {
+    result = JSON.parse(text);
+  } catch {
+    throw new Error("AI returned invalid structured data.");
+  }
+
+  result.confidence = clampConfidence(result.confidence);
+
+  /*
+     HARD SAFETY RULE:
+     RANDOM IMAGE = LOW CONFIDENCE
+  */
+
+  if (result.is_crop === false) {
+    result.confidence = Math.min(result.confidence, 15);
+    result.severity = "Unknown";
+  }
+
+  return result;
+}
+
+/* =========================
+   MAIN VERCEL FUNCTION
+========================= */
+
 export default async function handler(req, res) {
-
-  // =====================================================
-  // CROP PILOT - CROP IMAGE VALIDATION + AI ANALYSIS
-  // =====================================================
-
-  // -----------------------------------------------------
-  // ONLY POST REQUESTS
-  // -----------------------------------------------------
+  /* METHOD */
 
   if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Method not allowed"
+    res.setHeader("Allow", "POST");
+    return sendJSON(res, 405, { error: "Method not allowed" });
+  }
+
+  /* RATE LIMIT */
+
+  if (!checkRateLimit(req)) {
+    return sendJSON(res, 429, {
+      error: "Too many requests. Please wait a minute and try again."
     });
   }
 
+  /* API KEY */
+
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return sendJSON(res, 500, {
+      error: "GEMINI_API_KEY is not configured in Vercel."
+    });
+  }
 
   try {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
 
-    // ---------------------------------------------------
-    // REQUEST DATA
-    // ---------------------------------------------------
+    /* IMAGE */
 
-    const body = req.body || {};
+    const image = parseImage(body.image);
 
-    const image = body.image;
+    /* CROP */
 
-    const crop =
-      body.crop ||
-      "Unknown";
+    const crop = clean(body.crop || "Other", 40);
 
-    const language =
-      body.language ||
-      "English";
+    /* LANGUAGE */
 
-    const field =
-      body.field ||
-      {};
+    const language = clean(body.language || "English", 30);
 
+    const allowedLanguages = [
+      "English",
+      "Telugu",
+      "Hindi",
+      "Tamil",
+      "Kannada"
+    ];
 
-    // ---------------------------------------------------
-    // CHECK IMAGE
-    // ---------------------------------------------------
-
-    if (
-      !image ||
-      typeof image !== "string"
-    ) {
-
-      return res.status(400).json({
-        error: "No crop image received."
-      });
-
+    if (!allowedLanguages.includes(language)) {
+      return sendJSON(res, 400, { error: "Unsupported farmer language." });
     }
 
+    /* FIELD */
 
-    // ---------------------------------------------------
-    // GEMINI API KEY
-    // ---------------------------------------------------
+    const field = body.field && typeof body.field === "object" ? body.field : {};
 
-    const apiKey =
-      process.env.GEMINI_API_KEY;
+    const cleanField = {
+      place: clean(field.place, 100),
+      temperature: Number.isFinite(Number(field.temperature))
+        ? Number(field.temperature)
+        : null,
+      humidity: Number.isFinite(Number(field.humidity))
+        ? Number(field.humidity)
+        : null,
+      rain: Number.isFinite(Number(field.rain))
+        ? Number(field.rain)
+        : null,
+      wind: Number.isFinite(Number(field.wind))
+        ? Number(field.wind)
+        : null
+    };
 
+    /* AI */
 
-    if (!apiKey) {
+    const result = await analyzeWithGemini({
+      apiKey,
+      image,
+      crop,
+      language,
+      field: cleanField
+    });
 
-      return res.status(500).json({
-        error:
-          "GEMINI_API_KEY is not configured in Vercel."
-      });
+    return sendJSON(res, 200, result);
+  } catch (error) {
+    console.error("CropPilot API error:", error.message);
 
-    }
-
-
-    // ---------------------------------------------------
-    // IMAGE DATA
-    // ---------------------------------------------------
-
-    let base64Image = image;
-
-    let mimeType =
-      "image/jpeg";
-
-
-    if (
-      image.startsWith("data:")
-    ) {
-
-      const match =
-        image.match(
-          /^data:([^;]+);base64,(.+)$/
-        );
-
-
-      if (!match) {
-
-        return res.status(400).json({
-          error:
-            "Invalid image data format."
-        });
-
-      }
-
-
-      mimeType =
-        match[1];
-
-      base64Image =
-        match[2];
-
+    return sendJSON(res, 400, {
+      error: error.message || "Analysis failed."
+    });
+  }
+}
     }
 
 
