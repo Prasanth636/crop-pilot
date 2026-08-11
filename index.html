@@ -1,1087 +1,1471 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>CropPilot - AI Field Intelligence</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --green: #008f3d;
-      --green-dark: #006f30;
-      --green-light: #e9fff1;
-      --bg: #f3f8f4;
-      --card: #ffffff;
-      --text: #18321f;
-      --muted: #6c7b71;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --border: #dbe8df;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    button,
-    select,
-    input {
-      font: inherit;
-    }
-
-    .app {
-      width: min(1180px, 100%);
-      margin: auto;
-      min-height: 100vh;
-      background: var(--bg);
-    }
-
-    /* HEADER */
-
-    header {
-      background: linear-gradient(135deg, #009d43, #006f30);
-      color: white;
-      padding: 22px;
-      border-radius: 0 0 24px 24px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand {
-      font-size: 27px;
-      font-weight: 800;
-    }
-
-    .tagline {
-      margin-top: 5px;
-      font-size: 13px;
-      opacity: .9;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      border: 0;
-      border-radius: 50%;
-      background: rgba(255,255,255,.15);
-      color: white;
-      cursor: pointer;
-    }
-
-    .weather {
-      margin-top: 20px;
-      padding: 13px 15px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.12);
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    /* MAIN */
-
-    main {
-      padding: 22px;
-    }
-
-    .location {
-      color: #65746b;
-      font-size: 14px;
-      margin-bottom: 16px;
-    }
-
-    .dashboard {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 5px 18px rgba(30,80,45,.05);
-    }
-
-    .card h2 {
-      font-size: 20px;
-      margin-bottom: 5px;
-    }
-
-    .sub {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 15px;
-    }
-
-    /* UPLOAD */
-
-    .upload-box {
-      border: 2px dashed #9acdae;
-      background: var(--green-light);
-      border-radius: 16px;
-      min-height: 230px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 18px;
-      overflow: hidden;
-    }
-
-    .upload-icon {
-      font-size: 45px;
-      margin-bottom: 10px;
-    }
-
-    .preview {
-      display: none;
-      width: 100%;
-      max-height: 260px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
-
-    .upload-title {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .upload-help {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .upload-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-      width: 100%;
-    }
-
-    .upload-buttons button {
-      flex: 1;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 11px;
-      padding: 13px 15px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .btn-green {
-      background: var(--green);
-      color: white;
-    }
-
-    .btn-green:hover {
-      background: var(--green-dark);
-    }
-
-    .btn-light {
-      background: #edf5ef;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    select {
-      width: 100%;
-      padding: 13px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: white;
-      margin-top: 7px;
-      color: var(--text);
-    }
-
-    .analyze {
-      width: 100%;
-      margin-top: 15px;
-      font-size: 15px;
-    }
-
-    .analyze:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    /* FIELD INTELLIGENCE */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .stat {
-      background: #f0faf3;
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .stat-label {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-      margin-bottom: 5px;
-    }
-
-    .stat-value {
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .how-box {
-      margin-top: 15px;
-      background: #e8fff0;
-      border-left: 4px solid var(--green);
-      border-radius: 10px;
-      padding: 13px;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    /* DIAGNOSIS */
-
-    .diagnosis {
-      margin-top: 18px;
-    }
-
-    .diagnosis-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .diagnosis-name {
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .confidence {
-      margin-top: 10px;
-      height: 8px;
-      border-radius: 10px;
-      background: #e1e9e4;
-      overflow: hidden;
-    }
-
-    .confidence-bar {
-      height: 100%;
-      width: 0%;
-      background: #00b84f;
-      transition: width .5s;
-    }
-
-    .result-box {
-      margin-top: 10px;
-      padding: 13px;
-      border-radius: 12px;
-      line-height: 1.45;
-      font-size: 13px;
-    }
-
-    .green-box {
-      background: #e8fff0;
-      border-left: 4px solid #00a847;
-    }
-
-    .red-box {
-      background: #fff0f0;
-      border-left: 4px solid #ef4444;
-    }
-
-    .yellow-box {
-      background: #fff8e8;
-      border-left: 4px solid #f59e0b;
-    }
-
-    .evidence-list {
-      margin-top: 7px;
-      padding-left: 20px;
-    }
-
-    .evidence-list li {
-      margin-bottom: 4px;
-    }
-
-    /* LOADING */
-
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 15px;
-      color: var(--green-dark);
-      font-weight: 700;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 3px solid #b9dec5;
-      border-top-color: var(--green);
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-      vertical-align: middle;
-      margin-right: 7px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* LANGUAGE */
-
-    .settings-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-top: 15px;
-    }
-
-    .settings-row select {
-      margin: 0;
-      flex: 1;
-    }
-
-    /* FOOTER */
-
-    footer {
-      text-align: center;
-      color: #809087;
-      font-size: 11px;
-      padding: 30px 20px;
-    }
-
-    /* TABLET */
-
-    @media (max-width: 800px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 520px) {
-      header {
-        border-radius: 0 0 20px 20px;
-        padding: 17px;
-      }
-
-      .brand {
-        font-size: 22px;
-      }
-
-      main {
-        padding: 12px;
-      }
-
-      .card {
-        padding: 14px;
-        border-radius: 14px;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .upload-box {
-        min-height: 210px;
-      }
-
-      .upload-buttons {
-        flex-direction: column;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<meta name="theme-color" content="#008f3d">
+
+<title>CropPilot - AI Field Intelligence</title>
+
+<style>
+:root {
+  --bg: #eef8f1;
+  --card: #ffffff;
+  --text: #17352a;
+  --muted: #6d8177;
+  --green: #008f3d;
+  --green2: #00b84f;
+  --soft: #e9f8ee;
+  --border: #d7e8dc;
+  --danger: #e63d4d;
+  --warning: #f39b27;
+  --shadow: 0 8px 24px rgba(16,70,38,.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  max-width: 1180px;
+  min-height: 100vh;
+  margin: auto;
+}
+
+/* HEADER */
+
+.hero {
+  background: linear-gradient(135deg, #007d36, #00a947);
+  color: white;
+  padding: 22px 20px 18px;
+  border-radius: 0 0 28px 28px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.tagline {
+  font-size: 13px;
+  opacity: .9;
+  margin-top: 3px;
+}
+
+.theme-button {
+  border: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  color: white;
+  font-size: 20px;
+}
+
+.weather-bar {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.13);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* MAIN */
+
+.location {
+  padding: 15px 18px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 18px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  margin: 0 0 5px;
+  font-size: 20px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* UPLOAD */
+
+.upload-box {
+  margin-top: 14px;
+  padding: 18px;
+  text-align: center;
+  border: 2px dashed #9dd9b4;
+  border-radius: 16px;
+  background: var(--soft);
+}
+
+.camera-icon {
+  font-size: 42px;
+}
+
+.upload-title {
+  margin: 5px 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
+.primary {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+.primary:hover {
+  background: var(--green2);
+}
+
+.btn:disabled {
+  opacity: .55;
+}
+
+.select {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+}
+
+.analyze {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.preview {
+  display: none;
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  margin-top: 12px;
+  border-radius: 14px;
+}
+
+/* FIELD */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.stat {
+  padding: 11px;
+  text-align: center;
+  border-radius: 12px;
+  background: var(--soft);
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 5px;
+}
+
+.how {
+  margin-top: 12px;
+  padding: 13px;
+  border-left: 4px solid var(--green);
+  background: var(--soft);
+  border-radius: 12px;
+}
+
+/* DIAGNOSIS */
+
+.diagnosis {
+  grid-column: 1 / -1;
+}
+
+.diagnosis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result {
+  margin-top: 14px;
+  padding: 15px;
+  border-radius: 14px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+}
+
+.result-title {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.bad {
+  background: #ffe0e3;
+  color: #a21f2d;
+}
+
+.warn {
+  background: #fff0d8;
+  color: #9a5b00;
+}
+
+.good {
+  background: #d9f7e4;
+  color: #087b36;
+}
+
+.progress {
+  height: 7px;
+  margin-top: 10px;
+  background: var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+}
+
+.advice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.advice-box {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--soft);
+}
+
+.danger {
+  border-left: 4px solid var(--danger);
+}
+
+.green-border {
+  border-left: 4px solid var(--green);
+}
+
+/* LANGUAGE */
+
+.language-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.language-row .select {
+  margin: 0;
+  flex: 1;
+}
+
+.voice {
+  white-space: nowrap;
+}
+
+/* FOOTER */
+
+.footer {
+  padding: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* DARK */
+
+body.dark {
+  --bg: #0d1712;
+  --card: #14211a;
+  --text: #edf9f0;
+  --muted: #a6b8ae;
+  --soft: #193025;
+  --border: #294136;
+}
+
+/* MOBILE */
+
+@media(max-width:760px) {
+
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .diagnosis {
+    grid-column: auto;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .advice {
+    grid-template-columns: 1fr;
+  }
+
+  .brand {
+    font-size: 23px;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <header>
-    <div class="topbar">
+<header class="hero">
 
-      <div>
-        <div class="brand">🌱 CropPilot</div>
-        <div class="tagline">
-          From Field Signals to the Right Action
-        </div>
+  <div class="top">
+
+    <div>
+      <div class="brand">
+        🌱 CropPilot
       </div>
 
-      <div class="header-actions">
-        <button class="icon-btn" id="voiceHeaderBtn" title="Voice">
-          🔊
-        </button>
+      <div class="tagline">
+        From Field Signals to the Right Action
       </div>
-
     </div>
 
-    <div class="weather">
-      <span>📍 <span id="locationText">Detecting location...</span></span>
-      <span>🌤️ <span id="temperature">--°C</span></span>
+    <button
+      id="themeButton"
+      class="theme-button">
+      🌙
+    </button>
+
+  </div>
+
+  <div class="weather-bar">
+
+    <span id="weatherLocation">
+      📍 Detecting location...
+    </span>
+
+    <strong id="weatherTemp">
+      🌤️ --°C
+    </strong>
+
+  </div>
+
+</header>
+
+
+<div
+  id="farmLocation"
+  class="location">
+
+  📍 Farm location: Detecting...
+
+</div>
+
+
+<main class="grid">
+
+<!-- SCAN -->
+
+<section class="card">
+
+  <h2>
+    Scan your crop
+  </h2>
+
+  <div class="sub">
+    Upload a clear leaf or crop photo for better analysis.
+  </div>
+
+
+  <div class="upload-box">
+
+    <div class="camera-icon">
+      📷
     </div>
-  </header>
 
-  <main>
-
-    <div class="location">
-      📍 Farm location:
-      <strong id="locationStatus">Detecting...</strong>
+    <div class="upload-title">
+      Take or upload a crop photo
     </div>
 
-    <div class="dashboard">
-
-      <!-- UPLOAD CARD -->
-
-      <section class="card">
-
-        <h2>Scan your crop</h2>
-        <div class="sub">
-          Upload a clear leaf or crop photo for better analysis.
-        </div>
-
-        <div class="upload-box">
-
-          <img id="preview" class="preview" alt="Crop preview">
-
-          <div id="uploadIcon" class="upload-icon">📷</div>
-
-          <div id="uploadTitle" class="upload-title">
-            Take or upload a crop photo
-          </div>
-
-          <div id="uploadHelp" class="upload-help">
-            Choose Camera or Gallery
-          </div>
-
-          <div class="upload-buttons">
-
-            <!-- CAMERA INPUT -->
-            <input
-              type="file"
-              id="cameraInput"
-              accept="image/*"
-              capture="environment"
-              hidden
-            >
-
-            <!-- GALLERY INPUT -->
-            <input
-              type="file"
-              id="galleryInput"
-              accept="image/*"
-              hidden
-            >
-
-            <button
-              class="btn btn-light"
-              type="button"
-              id="cameraBtn"
-            >
-              📷 Camera
-            </button>
-
-            <button
-              class="btn btn-light"
-              type="button"
-              id="galleryBtn"
-            >
-              🖼️ Gallery
-            </button>
-
-          </div>
-
-        </div>
-
-        <label for="cropSelect">
-          <strong>Select crop</strong>
-        </label>
-
-        <select id="cropSelect">
-          <option value="Tomato">Tomato</option>
-          <option value="Chilli">Chilli</option>
-          <option value="Potato">Potato</option>
-          <option value="Rice">Rice</option>
-          <option value="Cotton">Cotton</option>
-          <option value="Maize">Maize</option>
-          <option value="Groundnut">Groundnut</option>
-          <option value="Other">Other</option>
-        </select>
-
-        <button
-          class="btn btn-green analyze"
-          id="analyzeBtn"
-          disabled
-        >
-          🔍 Analyze My Crop
-        </button>
-
-        <div class="loading" id="loading">
-          <span class="spinner"></span>
-          AI is analyzing your crop...
-        </div>
-
-      </section>
+    <div class="sub">
+      Choose Camera or Gallery
+    </div>
 
 
-      <!-- FIELD INTELLIGENCE -->
+    <div class="actions">
 
-      <section class="card">
+      <label
+        class="btn"
+        for="cameraInput">
 
-        <h2>Field intelligence</h2>
+        📷 Camera
 
-        <div class="sub">
-          Current conditions around your farm
-        </div>
+      </label>
 
-        <div class="stats">
 
-          <div class="stat">
-            <span class="stat-label">Temperature</span>
-            <span class="stat-value" id="weatherTemp">--</span>
-          </div>
+      <label
+        class="btn"
+        for="galleryInput">
 
-          <div class="stat">
-            <span class="stat-label">Humidity</span>
-            <span class="stat-value" id="humidity">--</span>
-          </div>
+        🖼️ Gallery
 
-          <div class="stat">
-            <span class="stat-label">Rain risk</span>
-            <span class="stat-value" id="rainRisk">--</span>
-          </div>
-
-          <div class="stat">
-            <span class="stat-label">Wind</span>
-            <span class="stat-value" id="wind">--</span>
-          </div>
-
-        </div>
-
-        <div class="how-box">
-          🌱 <strong>How CropPilot works</strong>
-          <br>
-          Crop image + crop type + field conditions are combined
-          to generate an actionable field advisory.
-        </div>
-
-      </section>
+      </label>
 
     </div>
 
 
-    <!-- DIAGNOSIS -->
+    <!-- CAMERA -->
 
-    <section class="card diagnosis">
-
-      <div class="diagnosis-header">
-        <div>
-          <h2>Field diagnosis</h2>
-          <div class="sub">
-            AI-powered crop health analysis
-          </div>
-        </div>
-
-        <button
-          class="btn btn-light"
-          id="speakBtn"
-          type="button"
-        >
-          🔊 Speak
-        </button>
-      </div>
+    <input
+      id="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment">
 
 
-      <div
-        id="diagnosisName"
-        class="diagnosis-name"
-      >
-        Waiting for crop image
-      </div>
+    <!-- GALLERY -->
 
-      <div id="diagnosisDescription" class="sub">
-        Upload a crop photo and select Analyze My Crop.
-      </div>
-
-      <div class="confidence">
-        <div
-          id="confidenceBar"
-          class="confidence-bar"
-        ></div>
-      </div>
-
-      <div
-        id="confidenceText"
-        style="margin-top:7px;font-size:12px;"
-      >
-        Confidence: --
-      </div>
+    <input
+      id="galleryInput"
+      type="file"
+      accept="image/*">
 
 
-      <div
-        id="evidenceBox"
-        class="result-box green-box"
-        style="display:none;"
-      >
-        <strong>🔎 Why CropPilot thinks this</strong>
+    <img
+      id="preview"
+      class="preview"
+      alt="Crop preview">
 
-        <ul
-          id="evidenceList"
-          class="evidence-list"
-        ></ul>
-      </div>
+  </div>
 
 
-      <div
-        id="actionBox"
-        class="result-box green-box"
-        style="display:none;"
-      >
-        <strong>🌱 What to do now</strong>
+  <select
+    id="crop"
+    class="select">
 
-        <div id="actionText" style="margin-top:5px;"></div>
-      </div>
+    <option>Tomato</option>
+    <option>Potato</option>
+    <option>Rice</option>
+    <option>Chilli</option>
+    <option>Cotton</option>
+    <option>Maize</option>
+    <option>Groundnut</option>
+    <option>Other</option>
 
-
-      <div
-        id="warningBox"
-        class="result-box red-box"
-        style="display:none;"
-      >
-        <strong>⚠️ Safety / timing advice</strong>
-
-        <div id="warningText" style="margin-top:5px;"></div>
-      </div>
+  </select>
 
 
-      <div
-        id="actionWindowBox"
-        class="result-box green-box"
-        style="display:none;"
-      >
-        <strong>🕐 Recommended action window</strong>
+  <button
+    id="analyzeButton"
+    class="btn primary analyze"
+    disabled>
 
-        <div
-          id="actionWindow"
-          style="margin-top:5px;"
-        ></div>
-      </div>
+    🔍 Analyze My Crop
 
-    </section>
+  </button>
+
+</section>
 
 
-    <!-- LANGUAGE -->
+<!-- FIELD INTELLIGENCE -->
 
-    <section class="card" style="margin-top:18px;">
+<section class="card">
 
-      <h2>🌐 Farmer language</h2>
+  <h2>
+    Field intelligence
+  </h2>
+
+  <div class="sub">
+    Current conditions around your farm
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <span>Temperature</span>
+      <strong id="temperature">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Humidity</span>
+      <strong id="humidity">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Rain risk</span>
+      <strong id="rain">--</strong>
+    </div>
+
+    <div class="stat">
+      <span>Wind</span>
+      <strong id="wind">--</strong>
+    </div>
+
+  </div>
+
+
+  <div class="how">
+
+    🌱 <strong>
+      How CropPilot works
+    </strong>
+
+    <br>
+
+    <span class="sub">
+
+      Crop image + crop type +
+      field conditions are combined
+      to generate an actionable
+      field advisory.
+
+    </span>
+
+  </div>
+
+</section>
+
+
+<!-- DIAGNOSIS -->
+
+<section class="card diagnosis">
+
+  <div class="diagnosis-header">
+
+    <div>
+
+      <h2>
+        Field diagnosis
+      </h2>
 
       <div class="sub">
-        Choose the language for the advisory and voice.
+        AI-powered crop health analysis
       </div>
 
-      <div class="settings-row">
+    </div>
 
-        <select id="languageSelect">
-          <option value="English">English</option>
-          <option value="Telugu">తెలుగు</option>
-          <option value="Hindi">हिन्दी</option>
-        </select>
 
-        <button
-          class="btn btn-green"
-          id="voiceBtn"
-          type="button"
-        >
-          🔊 Voice
-        </button>
+    <button
+      id="speakButton"
+      class="btn">
 
+      🔊 Speak
+
+    </button>
+
+  </div>
+
+
+  <div
+    id="result"
+    class="result">
+
+    <div class="result-title">
+      Waiting for crop image
+    </div>
+
+    <div class="sub">
+      Upload a crop photo and select
+      Analyze My Crop.
+    </div>
+
+    <div class="progress">
+
+      <div
+        id="progressBar"
+        class="progress-bar">
       </div>
 
-    </section>
+    </div>
 
-  </main>
+    <div
+      class="sub"
+      style="margin-top:7px">
+
+      Confidence:
+      <span id="confidence">
+        --
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
 
 
-  <footer>
-    CropPilot AI • Field intelligence for better decisions
-    <br>
-    AI advice should be verified with local agricultural guidance.
-  </footer>
+<!-- LANGUAGE -->
+
+<section class="card">
+
+  <h2>
+    🌐 Farmer language
+  </h2>
+
+  <div class="sub">
+    Choose the language for the advisory and voice.
+  </div>
+
+
+  <div class="language-row">
+
+    <select
+      id="language"
+      class="select">
+
+      <option value="English">
+        English
+      </option>
+
+      <option value="Telugu">
+        తెలుగు (Telugu)
+      </option>
+
+      <option value="Hindi">
+        हिन्दी (Hindi)
+      </option>
+
+      <option value="Tamil">
+        தமிழ் (Tamil)
+      </option>
+
+      <option value="Kannada">
+        ಕನ್ನಡ (Kannada)
+      </option>
+
+    </select>
+
+
+    <button
+      id="voiceButton"
+      class="btn primary voice">
+
+      🔊 Voice
+
+    </button>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<footer class="footer">
+
+  CropPilot AI • Field intelligence for better decisions
+
+  <br><br>
+
+  AI advice should be verified with local
+  agricultural guidance.
+
+</footer>
 
 </div>
 
 
 <script>
 
-  /* =========================
-     ELEMENTS
-  ========================= */
+let selectedFile = null;
+let currentResult = null;
 
-  const cameraInput = document.getElementById("cameraInput");
-  const galleryInput = document.getElementById("galleryInput");
-
-  const cameraBtn = document.getElementById("cameraBtn");
-  const galleryBtn = document.getElementById("galleryBtn");
-
-  const preview = document.getElementById("preview");
-
-  const uploadIcon = document.getElementById("uploadIcon");
-  const uploadTitle = document.getElementById("uploadTitle");
-  const uploadHelp = document.getElementById("uploadHelp");
-
-  const analyzeBtn = document.getElementById("analyzeBtn");
-  const loading = document.getElementById("loading");
-
-  const cropSelect = document.getElementById("cropSelect");
-  const languageSelect = document.getElementById("languageSelect");
+let field = {
+  place: "Unknown",
+  temperature: null,
+  humidity: null,
+  rain: null,
+  wind: null
+};
 
 
-  let selectedFile = null;
-  let selectedImageBase64 = null;
+/* THEME */
+
+const themeButton =
+  document.getElementById("themeButton");
+
+function setTheme(dark) {
+
+  document.body.classList.toggle(
+    "dark",
+    dark
+  );
+
+  themeButton.textContent =
+    dark ? "☀️" : "🌙";
+
+  localStorage.setItem(
+    "cropPilotTheme",
+    dark ? "dark" : "light"
+  );
+}
+
+setTheme(
+  localStorage.getItem("cropPilotTheme") === "dark"
+);
+
+themeButton.onclick = function() {
+
+  setTheme(
+    !document.body.classList.contains("dark")
+  );
+
+};
 
 
-  /* =========================
-     CAMERA
-  ========================= */
+/* FILE UPLOAD */
 
-  cameraBtn.addEventListener("click", () => {
-    cameraInput.click();
-  });
+const cameraInput =
+  document.getElementById("cameraInput");
 
+const galleryInput =
+  document.getElementById("galleryInput");
 
-  /* =========================
-     GALLERY
-  ========================= */
+const preview =
+  document.getElementById("preview");
 
-  galleryBtn.addEventListener("click", () => {
-    galleryInput.click();
-  });
+const analyzeButton =
+  document.getElementById("analyzeButton");
 
 
-  /* =========================
-     FILE HANDLING
-  ========================= */
+function handleFile(file) {
 
-  cameraInput.addEventListener("change", handleFile);
-  galleryInput.addEventListener("change", handleFile);
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+
+    alert("Please select an image.");
+
+    return;
+  }
+
+  selectedFile = file;
+
+  preview.src =
+    URL.createObjectURL(file);
+
+  preview.style.display = "block";
+
+  analyzeButton.disabled = false;
+
+}
 
 
-  function handleFile(event) {
+cameraInput.addEventListener(
+  "change",
+  function(event) {
 
-    const file = event.target.files?.[0];
+    handleFile(
+      event.target.files[0]
+    );
 
-    if (!file) return;
+  }
+);
 
-    if (!file.type.startsWith("image/")) {
 
-      alert("Please choose an image file.");
+galleryInput.addEventListener(
+  "change",
+  function(event) {
 
-      event.target.value = "";
+    handleFile(
+      event.target.files[0]
+    );
 
-      return;
-    }
+  }
+);
 
-    selectedFile = file;
 
-    const reader = new FileReader();
+/* LOCATION */
 
-    reader.onload = () => {
+function getLocation() {
 
-      selectedImageBase64 = reader.result;
+  if (!navigator.geolocation) {
 
-      preview.src = selectedImageBase64;
+    document.getElementById(
+      "farmLocation"
+    ).textContent =
+      "📍 Location unavailable";
 
-      preview.style.display = "block";
+    return;
 
-      uploadIcon.style.display = "none";
-
-      uploadTitle.textContent = file.name;
-
-      uploadHelp.textContent =
-        "Image selected successfully";
-
-      analyzeBtn.disabled = false;
-    };
-
-    reader.readAsDataURL(file);
   }
 
 
-  /* =========================
-     ANALYZE
-  ========================= */
+  navigator.geolocation.getCurrentPosition(
 
-  analyzeBtn.addEventListener("click", analyzeCrop);
+    async function(position) {
+
+      const lat =
+        position.coords.latitude;
+
+      const lon =
+        position.coords.longitude;
 
 
-  async function analyzeCrop() {
+      await getWeather(
+        lat,
+        lon
+      );
 
-    if (!selectedImageBase64) {
+      await reverseLocation(
+        lat,
+        lon
+      );
 
-      alert("Please choose a crop image first.");
+    },
 
-      return;
+    function() {
+
+      document.getElementById(
+        "farmLocation"
+      ).textContent =
+        "📍 Location permission not granted";
+
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 10000
+    }
+
+  );
+
+}
+
+
+/* WEATHER */
+
+async function getWeather(lat, lon) {
+
+  try {
+
+    const url =
+      "https://api.open-meteo.com/v1/forecast" +
+      "?latitude=" + lat +
+      "&longitude=" + lon +
+      "&current=" +
+      "temperature_2m," +
+      "relative_humidity_2m," +
+      "wind_speed_10m" +
+      "&hourly=precipitation_probability" +
+      "&forecast_days=1" +
+      "&timezone=auto";
+
+
+    const response =
+      await fetch(url);
+
+    const data =
+      await response.json();
+
+
+    const current =
+      data.current;
+
+
+    field.temperature =
+      Math.round(
+        current.temperature_2m
+      );
+
+    field.humidity =
+      Math.round(
+        current.relative_humidity_2m
+      );
+
+    field.wind =
+      Math.round(
+        current.wind_speed_10m
+      );
+
+
+    const rainValues =
+      data.hourly
+        .precipitation_probability
+        .slice(0,12);
+
+
+    field.rain =
+      Math.max(
+        ...rainValues
+      );
+
+
+    document.getElementById(
+      "temperature"
+    ).textContent =
+      field.temperature + "°C";
+
+
+    document.getElementById(
+      "humidity"
+    ).textContent =
+      field.humidity + "%";
+
+
+    document.getElementById(
+      "rain"
+    ).textContent =
+      field.rain + "%";
+
+
+    document.getElementById(
+      "wind"
+    ).textContent =
+      field.wind + " km/h";
+
+
+    document.getElementById(
+      "weatherTemp"
+    ).textContent =
+      "🌤️ " +
+      field.temperature +
+      "°C";
+
+  }
+
+  catch(error) {
+
+    console.log(error);
+
+  }
+
+}
+
+
+/* LOCATION NAME */
+
+async function reverseLocation(
+  lat,
+  lon
+) {
+
+  try {
+
+    const url =
+      "https://geocoding-api.open-meteo.com/v1/reverse" +
+      "?latitude=" + lat +
+      "&longitude=" + lon +
+      "&count=1" +
+      "&language=en" +
+      "&format=json";
+
+
+    const response =
+      await fetch(url);
+
+    const data =
+      await response.json();
+
+
+    const place =
+      data.results &&
+      data.results[0];
+
+
+    if (place) {
+
+      field.place =
+        place.name +
+        ", " +
+        (place.admin1 || "");
+
     }
 
 
-    const crop = cropSelect.value;
-    const language = languageSelect.value;
+    document.getElementById(
+      "weatherLocation"
+    ).textContent =
+      "📍 " + field.place;
 
 
-    analyzeBtn.disabled = true;
-    loading.style.display = "block";
+    document.getElementById(
+      "farmLocation"
+    ).textContent =
+      "📍 Farm location: " +
+      field.place;
+
+  }
+
+  catch(error) {
+
+    console.log(error);
+
+  }
+
+}
+
+
+getLocation();
+
+
+/* ANALYZE */
+
+analyzeButton.onclick =
+  async function() {
+
+    if (!selectedFile) {
+
+      alert(
+        "Please choose a crop image first."
+      );
+
+      return;
+
+    }
+
+
+    analyzeButton.disabled = true;
+
+    analyzeButton.textContent =
+      "⏳ Analyzing...";
+
+
+    const result =
+      document.getElementById("result");
+
+
+    result.innerHTML =
+
+      "<div class='result-title'>" +
+      "Analyzing your crop..." +
+      "</div>" +
+
+      "<div class='sub'>" +
+      "Please wait." +
+      "</div>" +
+
+      "<div class='progress'>" +
+      "<div class='progress-bar' " +
+      "style='width:40%'>" +
+      "</div></div>";
 
 
     try {
 
-      const response = await fetch("/api/analyze", {
-
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-          image: selectedImageBase64,
-
-          crop: crop,
-
-          language: language
-
-        })
-
-      });
+      const image =
+        await convertImage(
+          selectedFile
+        );
 
 
-      const data = await response.json();
+      const payload = {
+
+        image: image,
+
+        crop:
+          document.getElementById(
+            "crop"
+          ).value,
+
+        language:
+          document.getElementById(
+            "language"
+          ).value,
+
+        location:
+          field.place,
+
+        weather: {
+
+          temperature:
+            field.temperature,
+
+          humidity:
+            field.humidity,
+
+          rainRisk:
+            field.rain,
+
+          wind:
+            field.wind
+
+        }
+
+      };
+
+
+      const response =
+        await fetch(
+          "/api/analyze",
+          {
+
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(payload)
+
+          }
+        );
+
+
+      const data =
+        await response.json();
 
 
       if (!response.ok) {
 
         throw new Error(
-          data.error || "AI analysis failed."
+          data.error ||
+          "Analysis failed."
         );
+
       }
 
 
       showResult(data);
 
-    } catch (error) {
-
-      console.error(error);
-
-      alert(
-        "Analysis failed: " +
-        error.message
-      );
-
-    } finally {
-
-      analyzeBtn.disabled = false;
-
-      loading.style.display = "none";
     }
+
+    catch(error) {
+
+      result.innerHTML =
+
+        "<div class='result-title'>" +
+        "Analysis unavailable" +
+        "</div>" +
+
+        "<div class='sub'>" +
+        error.message +
+        "</div>";
+
+    }
+
+
+    analyzeButton.disabled = false;
+
+    analyzeButton.textContent =
+      "🔍 Analyze My Crop";
+
+  };
+
+
+/* IMAGE CONVERSION */
+
+function convertImage(file) {
+
+  return new Promise(
+    function(resolve, reject) {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(event) {
+
+          const image =
+            new Image();
+
+
+          image.onload =
+            function() {
+
+              const max =
+                1600;
+
+
+              const scale =
+                Math.min(
+                  1,
+                  max /
+                  Math.max(
+                    image.width,
+                    image.height
+                  )
+                );
+
+
+              const canvas =
+                document.createElement(
+                  "canvas"
+                );
+
+
+              canvas.width =
+                image.width * scale;
+
+              canvas.height =
+                image.height * scale;
+
+
+              const ctx =
+                canvas.getContext(
+                  "2d"
+                );
+
+
+              ctx.drawImage(
+                image,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+              );
+
+
+              resolve(
+                canvas.toDataURL(
+                  "image/jpeg",
+                  .82
+                )
+              );
+
+            };
+
+
+          image.onerror =
+            reject;
+
+
+          image.src =
+            event.target.result;
+
+        };
+
+
+      reader.onerror =
+        reject;
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* SHOW RESULT */
+
+function showResult(data) {
+
+  currentResult = data;
+
+
+  const confidence =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(data.confidence) || 0
+      )
+    );
+
+
+  let severity =
+    (data.severity || "moderate")
+    .toLowerCase();
+
+
+  let badgeClass =
+    "warn";
+
+
+  if (
+    severity === "healthy" ||
+    severity === "low"
+  ) {
+
+    badgeClass = "good";
+
   }
 
 
-  /* =========================
-     SHOW RESULT
-  ========================= */
+  if (
+    severity === "high" ||
+    severity === "severe"
+  ) {
 
-  function showResult(data) {
+    badgeClass = "bad";
 
-    const diagnosis =
+  }
+
+
+  const result =
+    document.getElementById("result");
+
+
+  result.innerHTML =
+
+    "<span class='badge " +
+    badgeClass +
+    "'>" +
+
+    escapeHtml(
+      severity.toUpperCase()
+    ) +
+
+    "</span>" +
+
+
+    "<div class='result-title'>" +
+
+    escapeHtml(
       data.diagnosis ||
-      "Unknown crop condition";
+      "Crop condition detected"
+    ) +
 
-    const confidence =
-      Number(data.confidence || 0);
-
-    document.getElementById(
-      "diagnosisName"
-    ).textContent =
-      "🔴 " + diagnosis;
+    "</div>" +
 
 
-    document.getElementById(
-      "diagnosisDescription"
-    ).textContent =
-      data.description ||
-      "AI analysis completed.";
+    "<div class='sub'>" +
+
+    escapeHtml(
+      data.summary || ""
+    ) +
+
+    "</div>" +
 
 
-    const safeConfidence =
-      Math.max(
-        0,
-        Math.min(
-          100,
-          confidence
-        )
-      );
+    "<div class='progress'>" +
+
+    "<div id='progressBar' " +
+    "class='progress-bar'></div>" +
+
+    "</div>" +
 
 
-    document.getElementById(
-      "confidenceBar"
-    ).style.width =
-      safeConfidence + "%";
+    "<div class='sub' " +
+    "style='margin-top:7px'>" +
+
+    "Confidence: " +
+
+    confidence +
+
+    "%" +
+
+    "</div>" +
 
 
-    document.getElementById(
-      "confidenceText"
-    ).textContent =
-      "Confidence: " +
-      safeConfidence +
-      "%";
+    "<div class='advice'>" +
 
 
-    /* EVIDENCE */
+    "<div class='advice-box green-border'>" +
 
-    const evidenceBox =
-      document.getElementById(
-        "evidenceBox"
-      );
+    "<strong>🌱 What to do now</strong><br>" +
 
-    const evidenceList =
-      document.getElementById(
-        "evidenceList"
-      );
+    "<span class='sub'>" +
 
+    escapeHtml(
+      data.action ||
+      "Follow locally approved guidance."
+    ) +
 
-    evidenceList.innerHTML = "";
+    "</span>" +
 
-
-    if (
-      Array.isArray(data.evidence) &&
-      data.evidence.length
-    ) {
-
-      data.evidence.forEach(item => {
-
-        const li =
-          document.createElement("li");
-
-        li.textContent = item;
-
-        evidenceList.appendChild(li);
-      });
-
-      evidenceBox.style.display = "block";
-
-    } else {
-
-      evidenceBox.style.display = "none";
-    }
+    "</div>" +
 
 
-    /* ACTION */
+    "<div class='advice-box danger'>" +
 
-    const actionBox =
-      document.getElementById(
-        "actionBox"
-      );
+    "<strong>" +
 
-    if (data.action) {
+    (
+      data.spray_now === fals
+      ? "🚫 Don't spray now"
+      : "🧪 Treatment guidance"
+    ) +
 
-      document.getElementById(
-        "actionText"
-      ).textContent =
-        data.action;
+    "</strong><br>" +
 
-      actionBox.style.display =
-        "block";
+    "<span class='sub'>" +
 
-    } else {
+    escapeHtml(
+      data.treatment ||
+      "Follow local agricultural guidance."
+    ) +
 
-      actionBox.style.display =
-        "none";
-    }
+    "</span>" +
 
-
-    /* WARNING */
-
-    const warningBox =
-      document.getElementById(
-        "warningBox"
-      );
-
-    if (data.warning) {
-
-      document.getElementById(
-        "warningText"
-      ).textContent =
-        data.warning;
-
-      warningBox.style.display =
-        "block";
-
-    } else {
-
-      warningBox.style.display =
-        "none";
-    }
+    "</div>" +
 
 
-    /* ACTION WINDOW */
+    "<div class='advice-box green-border'>" +
 
-    const actionWindowBox =
-      document.getElementById(
-        "actionWindowBox"
-      );
+    "<strong>💡 Why CropPilot thinks this</strong><br>" +
 
-    if (data.action_window) {
+    "<span class='sub'>" +
 
-      document.getElementById(
-        "actionWindow"
-      ).textContent =
-        data.action_window;
-
-      actionWindowBox.style.display =
-        "block";
-
-    } else {
-
-      actionWindowBox.style.display =
-        "none";
-    }
-
-
-    /* SPEECH */
-
-    window.currentAdvisory =
-      build
+    escapeHtml(
+      data.reason ||
+      "Visup
