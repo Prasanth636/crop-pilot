@@ -5,7 +5,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
 
     return res.status(405).json({
-      error: "POST only"
+      error: "POST method required."
     });
 
   }
@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({
 
       error:
-        "GEMINI_API_KEY is not configured in Vercel."
+        "Gemini API key is not configured yet. Add GEMINI_API_KEY in Vercel Environment Variables."
 
     });
 
@@ -49,15 +49,12 @@ module.exports = async function handler(req, res) {
       body.weather || {};
 
 
-    if (
-      !image ||
-      !image.startsWith("data:image/")
-    ) {
+    if (!image) {
 
       return res.status(400).json({
 
         error:
-          "A crop image is required."
+          "No crop image was received."
 
       });
 
@@ -89,28 +86,12 @@ module.exports = async function handler(req, res) {
       match[2];
 
 
-    if (
-      base64.length >
-      12000000
-    ) {
-
-      return res.status(413).json({
-
-        error:
-          "Image is too large. Please choose a smaller photo."
-
-      });
-
-    }
-
-
     const prompt = `
 
 You are CropPilot,
 an agricultural field-assistance AI.
 
-Analyze the supplied crop/leaf image
-together with crop type and field conditions.
+Analyze the crop image.
 
 Crop:
 ${crop}
@@ -134,35 +115,27 @@ Wind:
 ${weather.wind ?? "unknown"} km/h
 
 
-IMPORTANT:
+Rules:
 
-1. Do not claim certainty from an image alone.
+- Be conservative.
+- Do not claim certainty from an image alone.
+- If the image is unclear, say so.
+- Do not invent pesticide names.
+- Do not invent pesticide dosages.
+- Consider rain before recommending spraying.
+- Encourage locally approved agricultural guidance.
+- Return ONLY JSON.
 
-2. If the image is unclear or not a crop,
-say that a clearer crop photo is needed.
 
-3. Give practical and conservative advice.
-
-4. Do not invent pesticide products.
-
-5. Do not invent pesticide dosages.
-
-6. Treatment advice must follow
-locally approved agricultural guidance.
-
-7. Consider rain conditions before recommending spraying.
-
-8. Return ONLY valid JSON.
-
-Use this exact structure:
+Return exactly:
 
 {
   "diagnosis": "short diagnosis",
   "severity": "healthy|low|moderate|high|severe|uncertain",
   "confidence": 0,
-  "summary": "one or two sentences",
-  "reason": "main visual evidence",
-  "action": "what the farmer should do now",
+  "summary": "short explanation",
+  "reason": "visual evidence",
+  "action": "what farmer should do now",
   "treatment": "treatment or caution guidance",
   "spray_now": true,
   "action_window": "recommended timing",
@@ -231,7 +204,6 @@ Use this exact structure:
 
               ],
 
-
               generationConfig: {
 
                 temperature: 0.2,
@@ -261,19 +233,24 @@ Use this exact structure:
 
         error:
           data?.error?.message ||
-          "Gemini API request failed."
+          "Gemini request failed."
 
       });
 
     }
 
 
-    const text =
+    const parts =
       data
         ?.candidates?.[0]
-        ?.content?.parts
-        ?.map(
-          part => part.text || ""
+        ?.content?.parts || [];
+
+
+    const text =
+      parts
+        .map(
+          part =>
+            part.text || ""
         )
         .join("")
         .trim();
@@ -284,7 +261,7 @@ Use this exact structure:
       return res.status(502).json({
 
         error:
-          "Gemini returned no analysis."
+          "Gemini returned an empty response."
 
       });
 
@@ -310,7 +287,7 @@ Use this exact structure:
             ""
           )
           .replace(
-            /```$/i,
+            /```\s*$/i,
             ""
           )
           .trim();
@@ -330,7 +307,10 @@ Use this exact structure:
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      "CropPilot API error:",
+      error
+    );
 
 
     return res.status(500).json({
