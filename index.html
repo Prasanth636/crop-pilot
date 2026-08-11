@@ -1732,28 +1732,101 @@ function escapeHTML(text) {
 
 
 /* ==========================================
-   VOICE ADVISORY
+   LANGUAGE + VOICE
+========================================== */
+
+const languageSelect =
+  document.getElementById("language");
+
+const voiceButton =
+  document.getElementById("voiceButton");
+
+const speakButton =
+  document.getElementById("speakButton");
+
+
+/* ==========================================
+   LANGUAGE SETTINGS
+========================================== */
+
+const savedLanguage =
+  localStorage.getItem("cropPilotLanguage");
+
+if (savedLanguage) {
+
+  languageSelect.value =
+    savedLanguage;
+
+}
+
+
+/* Save selected language */
+
+languageSelect.addEventListener(
+  "change",
+  function () {
+
+    localStorage.setItem(
+      "cropPilotLanguage",
+      languageSelect.value
+    );
+
+    console.log(
+      "Selected language:",
+      languageSelect.value
+    );
+
+  }
+);
+
+
+/* ==========================================
+   LANGUAGE VOICE CODES
+========================================== */
+
+const languageMap = {
+
+  English: "en-IN",
+
+  Telugu: "te-IN",
+
+  Hindi: "hi-IN",
+
+  Tamil: "ta-IN",
+
+  Kannada: "kn-IN"
+
+};
+
+
+/* ==========================================
+   GET SELECTED LANGUAGE
+========================================== */
+
+function getSelectedLanguage() {
+
+  return (
+    languageSelect.value ||
+    "English"
+  );
+
+}
+
+
+/* ==========================================
+   VOICE FUNCTION
 ========================================== */
 
 function speakResult() {
 
-  if (!currentResult) {
-
-    alert(
-      "Analyze a crop first."
-    );
-
-    return;
-
-  }
-
+  /* Browser voice support */
 
   if (
     !("speechSynthesis" in window)
   ) {
 
     alert(
-      "Voice is not supported by this browser."
+      "Voice is not supported on this browser."
     );
 
     return;
@@ -1761,47 +1834,99 @@ function speakResult() {
   }
 
 
-  speechSynthesis.cancel();
-
-
   const language =
-    document.getElementById(
-      "language"
-    ).value;
+    getSelectedLanguage();
 
 
-  const languageMap = {
+  const voiceLanguage =
+    languageMap[language] ||
+    "en-IN";
 
-    English: "en-IN",
 
-    Telugu: "te-IN",
+  /*
+   * If AI result exists,
+   * speak the actual diagnosis.
+   */
 
-    Hindi: "hi-IN",
+  if (currentResult) {
 
-    Tamil: "ta-IN",
+    const text = [
 
-    Kannada: "kn-IN"
+      currentResult.diagnosis,
+
+      currentResult.summary,
+
+      "What to do now: " +
+        currentResult.action,
+
+      currentResult.treatment,
+
+      "Recommended action window: " +
+        currentResult.action_window
+
+    ]
+    .filter(Boolean)
+    .join(". ");
+
+
+    speakText(
+      text,
+      voiceLanguage
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * If there is no AI result yet,
+   * don't show the confusing
+   * "Analyze a crop first" alert.
+   *
+   * Instead tell the farmer
+   * what to do in the selected language.
+   */
+
+  const messages = {
+
+    English:
+      "Please upload a crop photo and press Analyze My Crop first.",
+
+    Telugu:
+      "దయచేసి ముందుగా పంట ఫోటోను అప్‌లోడ్ చేసి, నా పంటను విశ్లేషించండి అనే బటన్‌ను నొక్కండి.",
+
+    Hindi:
+      "कृपया पहले फसल की फोटो अपलोड करें और मेरी फसल का विश्लेषण करें बटन दबाएं।",
+
+    Tamil:
+      "முதலில் பயிரின் புகைப்படத்தை பதிவேற்றி, எனது பயிரை பகுப்பாய்வு செய்யவும் என்ற பொத்தானை அழுத்தவும்.",
+
+    Kannada:
+      "ದಯವಿಟ್ಟು ಮೊದಲು ಬೆಳೆ ಫೋಟೋವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ನನ್ನ ಬೆಳೆಯನ್ನು ವಿಶ್ಲೇಷಿಸಿ ಬಟನ್ ಒತ್ತಿರಿ."
 
   };
 
 
-  const text = [
+  speakText(
+    messages[language] ||
+    messages.English,
+    voiceLanguage
+  );
 
-    currentResult.diagnosis,
+}
 
-    currentResult.summary,
 
-    "What to do now: " +
-      currentResult.action,
+/* ==========================================
+   ACTUAL SPEECH
+========================================== */
 
-    currentResult.treatment,
+function speakText(
+  text,
+  languageCode
+) {
 
-    "Recommended action window: " +
-      currentResult.action_window
-
-  ]
-  .filter(Boolean)
-  .join(". ");
+  speechSynthesis.cancel();
 
 
   const utterance =
@@ -1811,13 +1936,63 @@ function speakResult() {
 
 
   utterance.lang =
-    languageMap[language] ||
-    "en-IN";
+    languageCode;
 
 
-  utterance.rate = 0.9;
+  utterance.rate =
+    0.88;
 
-  utterance.pitch = 1;
+
+  utterance.pitch =
+    1;
+
+
+  utterance.volume =
+    1;
+
+
+  /*
+   * Try to find the correct
+   * language voice.
+   */
+
+  const voices =
+    speechSynthesis.getVoices();
+
+
+  const matchingVoice =
+    voices.find(
+      function (voice) {
+
+        return voice.lang
+          .toLowerCase()
+          .startsWith(
+            languageCode
+              .split("-")[0]
+              .toLowerCase()
+          );
+
+      }
+    );
+
+
+  if (matchingVoice) {
+
+    utterance.voice =
+      matchingVoice;
+
+  }
+
+
+  utterance.onerror =
+    function (event) {
+
+      console.log(
+        "Voice error:",
+        event
+      );
+
+    };
 
 
   speechSynthesis.speak(
@@ -1828,22 +2003,48 @@ function speakResult() {
 
 
 /* ==========================================
-   VOICE BUTTONS
+   LOAD BROWSER VOICES
 ========================================== */
 
-document.getElementById(
-  "voiceButton"
-).addEventListener(
+if (
+  "speechSynthesis" in window
+) {
+
+  speechSynthesis.onvoiceschanged =
+    function () {
+
+      speechSynthesis.getVoices();
+
+    };
+
+}
+
+
+/* ==========================================
+   VOICE BUTTON
+========================================== */
+
+voiceButton.addEventListener(
   "click",
-  speakResult
+  function () {
+
+    speakResult();
+
+  }
 );
 
 
-document.getElementById(
-  "speakButton"
-).addEventListener(
+/* ==========================================
+   SPEAK BUTTON IN DIAGNOSIS
+========================================== */
+
+speakButton.addEventListener(
   "click",
-  speakResult
+  function () {
+
+    speakResult();
+
+  }
 );
 
 
@@ -1852,7 +2053,7 @@ document.getElementById(
 ========================================== */
 
 console.log(
-  "CropPilot loaded successfully."
+  "CropPilot language and voice system loaded."
 );
 
 </script>
