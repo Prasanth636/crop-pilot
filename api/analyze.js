@@ -1,6 +1,9 @@
 const MODEL = "gemini-2.5-flash";
 
+
 module.exports = async function handler(req, res) {
+
+  /* ONLY POST */
 
   if (req.method !== "POST") {
 
@@ -11,6 +14,8 @@ module.exports = async function handler(req, res) {
   }
 
 
+  /* API KEY */
+
   const apiKey =
     process.env.GEMINI_API_KEY;
 
@@ -20,7 +25,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({
 
       error:
-        "Gemini API key is not configured yet. Add GEMINI_API_KEY in Vercel Environment Variables."
+        "GEMINI_API_KEY is not configured in Vercel yet."
 
     });
 
@@ -49,17 +54,24 @@ module.exports = async function handler(req, res) {
       body.weather || {};
 
 
-    if (!image) {
+    /* IMAGE REQUIRED */
+
+    if(
+      typeof image !== "string" ||
+      !image.startsWith("data:image/")
+    ){
 
       return res.status(400).json({
 
         error:
-          "No crop image was received."
+          "No valid crop image was received."
 
       });
 
     }
 
+
+    /* EXTRACT IMAGE */
 
     const match =
       image.match(
@@ -67,12 +79,12 @@ module.exports = async function handler(req, res) {
       );
 
 
-    if (!match) {
+    if(!match){
 
       return res.status(400).json({
 
         error:
-          "Invalid image format."
+          "Invalid crop image."
 
       });
 
@@ -86,12 +98,16 @@ module.exports = async function handler(req, res) {
       match[2];
 
 
+    /* PROMPT */
+
     const prompt = `
 
 You are CropPilot,
 an agricultural field-assistance AI.
 
-Analyze the crop image.
+Your job is to analyze a farmer's
+crop or leaf photograph and provide
+a clear, conservative field advisory.
 
 Crop:
 ${crop}
@@ -108,26 +124,41 @@ ${weather.temperature ?? "unknown"} °C
 Humidity:
 ${weather.humidity ?? "unknown"} %
 
-Rain risk:
+Rain probability:
 ${weather.rainRisk ?? "unknown"} %
 
 Wind:
 ${weather.wind ?? "unknown"} km/h
 
 
-Rules:
+IMPORTANT RULES:
 
-- Be conservative.
-- Do not claim certainty from an image alone.
-- If the image is unclear, say so.
-- Do not invent pesticide names.
-- Do not invent pesticide dosages.
-- Consider rain before recommending spraying.
-- Encourage locally approved agricultural guidance.
-- Return ONLY JSON.
+1. Analyze the image carefully.
+
+2. Do not claim 100% certainty.
+
+3. If the image is unclear,
+say that a clearer photograph is required.
+
+4. Do not invent pesticide products.
+
+5. Do not invent pesticide dosages.
+
+6. Do not recommend unsafe chemical use.
+
+7. Consider rain and wind conditions
+when deciding whether spraying now
+makes sense.
+
+8. Give practical actions a farmer
+can understand.
+
+9. The answer must be valid JSON.
+
+10. Return ONLY JSON.
 
 
-Return exactly:
+Use exactly this structure:
 
 {
   "diagnosis": "short diagnosis",
@@ -145,6 +176,8 @@ Return exactly:
 `;
 
 
+    /* GEMINI REQUEST */
+
     const endpoint =
       "https://generativelanguage.googleapis.com/" +
       "v1beta/models/" +
@@ -157,9 +190,9 @@ Return exactly:
         endpoint,
         {
 
-          method: "POST",
+          method:"POST",
 
-          headers: {
+          headers:{
 
             "Content-Type":
               "application/json",
@@ -172,21 +205,21 @@ Return exactly:
           body:
             JSON.stringify({
 
-              contents: [
+              contents:[
 
                 {
 
-                  role: "user",
+                  role:"user",
 
-                  parts: [
+                  parts:[
 
                     {
-                      text: prompt
+                      text:prompt
                     },
 
                     {
 
-                      inline_data: {
+                      inline_data:{
 
                         mime_type:
                           mimeType,
@@ -204,11 +237,11 @@ Return exactly:
 
               ],
 
-              generationConfig: {
+              generationConfig:{
 
-                temperature: 0.2,
+                temperature:.2,
 
-                maxOutputTokens: 1200,
+                maxOutputTokens:1200,
 
                 responseMimeType:
                   "application/json"
@@ -225,7 +258,9 @@ Return exactly:
       await response.json();
 
 
-    if (!response.ok) {
+    /* GEMINI ERROR */
+
+    if(!response.ok){
 
       return res.status(
         response.status
@@ -233,68 +268,83 @@ Return exactly:
 
         error:
           data?.error?.message ||
-          "Gemini request failed."
+          "Gemini API request failed."
 
       });
 
     }
 
 
-    const parts =
-      data
-        ?.candidates?.[0]
-        ?.content?.parts || [];
-
+    /* GET TEXT */
 
     const text =
-      parts
-        .map(
-          part =>
-            part.text || ""
-        )
-        .join("")
-        .trim();
+      data
+      ?.candidates?.[0]
+      ?.content?.parts
+      ?.map(
+        part =>
+          part.text || ""
+      )
+      .join("")
+      .trim();
 
 
-    if (!text) {
+    if(!text){
 
       return res.status(502).json({
 
         error:
-          "Gemini returned an empty response."
+          "Gemini returned no analysis."
 
       });
 
     }
 
 
+    /* PARSE JSON */
+
     let result;
 
 
-    try {
+    try{
 
       result =
         JSON.parse(text);
 
     }
 
-    catch {
+    catch(error){
 
       const cleaned =
         text
-          .replace(
-            /^```json\s*/i,
-            ""
-          )
-          .replace(
-            /```\s*$/i,
-            ""
-          )
-          .trim();
+        .replace(
+          /^```json\s*/i,
+          ""
+        )
+        .replace(
+          /```\s*$/i,
+          ""
+        )
+        .trim();
 
 
-      result =
-        JSON.parse(cleaned);
+      try{
+
+        result =
+          JSON.parse(cleaned);
+
+      }
+
+      catch{
+
+        return res.status(502).json({
+
+          error:
+            "Gemini returned an invalid response."
+
+        });
+
+      }
 
     }
 
@@ -305,10 +355,11 @@ Return exactly:
 
   }
 
-  catch (error) {
+
+  catch(error){
 
     console.error(
-      "CropPilot API error:",
+      "CropPilot error:",
       error
     );
 
@@ -316,7 +367,7 @@ Return exactly:
     return res.status(500).json({
 
       error:
-        "Server error while analyzing the crop."
+        "Server error while analyzing crop."
 
     });
 
