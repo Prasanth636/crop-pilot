@@ -1,869 +1,449 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<meta
-  name="theme-color"
-  content="#008f3d"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#008f3d">
 
 <title>CropPilot - AI Field Intelligence</title>
 
-
 <style>
-
-/* =========================
-   THEME VARIABLES
-========================= */
-
-:root {
-
-  --bg: #eef8f1;
-  --card: #ffffff;
-  --text: #17352a;
-  --muted: #6d8177;
-
-  --green: #008f3d;
-  --green2: #00b84f;
-
-  --soft: #e9f8ee;
-  --border: #d5e8db;
-
-  --danger: #e5394d;
-  --warning: #f39a23;
-
-  --shadow:
-    0 7px 22px rgba(0, 80, 35, 0.08);
+:root{
+  --bg:#eef8f1;
+  --card:#ffffff;
+  --text:#17352a;
+  --muted:#6d8177;
+  --green:#008f3d;
+  --green2:#00b84f;
+  --soft:#e9f8ee;
+  --border:#d5e8db;
+  --danger:#e5394d;
+  --shadow:0 8px 25px rgba(0,80,35,.08);
 }
 
-
-/* DARK THEME */
-
-body.dark {
-
-  --bg: #0b1510;
-  --card: #142019;
-  --text: #effff4;
-  --muted: #a8bbb0;
-
-  --soft: #1a3024;
-  --border: #2d4738;
-
-  --shadow:
-    0 7px 22px rgba(0, 0, 0, 0.35);
+body.dark{
+  --bg:#0b1510;
+  --card:#142019;
+  --text:#effff4;
+  --muted:#a8bbb0;
+  --soft:#1a3024;
+  --border:#2d4738;
+  --shadow:0 8px 25px rgba(0,0,0,.35);
 }
 
-
-/* =========================
-   RESET
-========================= */
-
-* {
-  box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-
-html {
-  scroll-behavior: smooth;
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  transition:.25s;
 }
 
-
-body {
-
-  margin: 0;
-
-  background: var(--bg);
-
-  color: var(--text);
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  transition:
-    background .25s ease,
-    color .25s ease;
+button,
+select{
+  font:inherit;
 }
 
-
-/* =========================
-   APP
-========================= */
-
-.app {
-
-  width: 100%;
-
-  max-width: 1180px;
-
-  min-height: 100vh;
-
-  margin: auto;
+button{
+  cursor:pointer;
 }
 
-
-/* =========================
-   HEADER
-========================= */
-
-.hero {
-
-  background:
-    linear-gradient(
-      135deg,
-      #007c35,
-      #00a947
-    );
-
-  color: white;
-
-  padding:
-    20px
-    20px
-    18px;
-
-  border-radius:
-    0
-    0
-    28px
-    28px;
+.app{
+  max-width:1180px;
+  margin:auto;
+  min-height:100vh;
 }
 
+/* HEADER */
 
-.top {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 15px;
+.hero{
+  background:linear-gradient(135deg,#007c35,#00a947);
+  color:white;
+  padding:20px;
+  border-radius:0 0 28px 28px;
 }
 
-
-.brand {
-
-  font-size: 27px;
-
-  font-weight: 800;
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
 }
 
-
-.tagline {
-
-  margin-top: 4px;
-
-  font-size: 13px;
-
-  opacity: .9;
+.brand{
+  font-size:27px;
+  font-weight:800;
 }
 
-
-.theme-button {
-
-  width: 44px;
-
-  height: 44px;
-
-  border: 0;
-
-  border-radius: 50%;
-
-  background:
-    rgba(255,255,255,.18);
-
-  color: white;
-
-  font-size: 21px;
-
-  cursor: pointer;
+.tagline{
+  font-size:13px;
+  opacity:.9;
+  margin-top:4px;
 }
 
-
-.weather-bar {
-
-  margin-top: 18px;
-
-  padding: 13px 15px;
-
-  border-radius: 16px;
-
-  background:
-    rgba(255,255,255,.14);
-
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  gap: 10px;
+.theme-button{
+  width:44px;
+  height:44px;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.18);
+  color:white;
+  font-size:21px;
 }
 
-
-/* =========================
-   LOCATION
-========================= */
-
-.location {
-
-  padding:
-    15px
-    18px
-    0;
-
-  color: var(--muted);
-
-  font-size: 14px;
+.weather-bar{
+  margin-top:18px;
+  padding:13px 15px;
+  border-radius:16px;
+  background:rgba(255,255,255,.14);
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
 }
 
-
-/* =========================
-   GRID
-========================= */
-
-.grid {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 18px;
-
-  padding: 18px;
+.location{
+  padding:15px 18px 0;
+  color:var(--muted);
+  font-size:14px;
 }
 
+/* GRID */
 
-/* =========================
-   CARD
-========================= */
-
-.card {
-
-  background: var(--card);
-
-  color: var(--text);
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: 18px;
-
-  padding: 18px;
-
-  box-shadow: var(--shadow);
-
-  transition:
-    background .25s ease,
-    color .25s ease;
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  padding:18px;
 }
 
-
-.card h2 {
-
-  margin:
-    0
-    0
-    5px;
-
-  font-size: 20px;
+.card{
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:var(--shadow);
 }
 
-
-.sub {
-
-  color: var(--muted);
-
-  font-size: 12px;
-
-  line-height: 1.5;
+.card h2{
+  margin:0 0 5px;
+  font-size:20px;
 }
 
-
-/* =========================
-   UPLOAD
-========================= */
-
-.upload-box {
-
-  margin-top: 14px;
-
-  padding: 18px;
-
-  text-align: center;
-
-  border:
-    2px dashed
-    #9bd9b1;
-
-  border-radius: 16px;
-
-  background: var(--soft);
+.sub{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
 }
 
+/* UPLOAD */
 
-.camera-icon {
-
-  font-size: 42px;
-
-  margin-bottom: 5px;
+.upload-box{
+  margin-top:14px;
+  padding:18px;
+  text-align:center;
+  border:2px dashed #9bd9b1;
+  border-radius:16px;
+  background:var(--soft);
 }
 
-
-.upload-title {
-
-  font-size: 18px;
-
-  font-weight: 700;
-
-  margin-bottom: 4px;
+.camera-icon{
+  font-size:42px;
 }
 
-
-.actions {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 10px;
-
-  margin-top: 14px;
+.upload-title{
+  font-size:18px;
+  font-weight:700;
+  margin:5px 0;
 }
 
-
-/* HIDDEN FILE INPUT */
-
-.file-input {
-
-  position: absolute;
-
-  width: 1px;
-
-  height: 1px;
-
-  opacity: 0;
-
-  pointer-events: none;
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
 }
 
-
-/* BUTTON */
-
-.btn {
-
-  border:
-    1px solid
-    var(--border);
-
-  background: var(--card);
-
-  color: var(--text);
-
-  border-radius: 12px;
-
-  padding: 12px;
-
-  font-weight: 700;
-
-  cursor: pointer;
-
-  text-align: center;
-
-  font-size: 14px;
-
-  transition:
-    .2s ease;
+.btn{
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  border-radius:12px;
+  padding:12px;
+  font-weight:700;
+  text-align:center;
 }
 
-
-.btn:active {
-
-  transform: scale(.98);
+.btn:active{
+  transform:scale(.98);
 }
 
-
-.primary {
-
-  background: var(--green);
-
-  color: white;
-
-  border-color:
-    var(--green);
+.primary{
+  background:var(--green);
+  color:white;
+  border-color:var(--green);
 }
 
-
-.primary:hover {
-
-  background: var(--green2);
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
 }
 
-
-.btn:disabled {
-
-  opacity: .55;
-
-  cursor: not-allowed;
+.file-input{
+  position:fixed;
+  left:-9999px;
+  width:1px;
+  height:1px;
+  opacity:0;
 }
 
-
-.select {
-
-  width: 100%;
-
-  margin-top: 12px;
-
-  padding: 13px;
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: 12px;
-
-  background: var(--card);
-
-  color: var(--text);
-
-  font-size: 14px;
+.preview{
+  display:none;
+  width:100%;
+  max-height:280px;
+  object-fit:cover;
+  margin-top:12px;
+  border-radius:14px;
+  border:1px solid var(--border);
 }
 
-
-.preview {
-
-  display: none;
-
-  width: 100%;
-
-  max-height: 280px;
-
-  object-fit: cover;
-
-  margin-top: 12px;
-
-  border-radius: 14px;
-
-  border:
-    1px solid
-    var(--border);
+.select{
+  width:100%;
+  margin-top:12px;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card);
+  color:var(--text);
 }
 
-
-.analyze {
-
-  width: 100%;
-
-  margin-top: 12px;
+.analyze{
+  width:100%;
+  margin-top:12px;
 }
 
+/* FIELD */
 
-/* =========================
-   FIELD INTELLIGENCE
-========================= */
-
-.stats {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
-
-  gap: 8px;
-
-  margin-top: 14px;
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:14px;
 }
 
-
-.stat {
-
-  padding: 11px;
-
-  text-align: center;
-
-  border-radius: 12px;
-
-  background: var(--soft);
+.stat{
+  padding:11px;
+  text-align:center;
+  border-radius:12px;
+  background:var(--soft);
 }
 
-
-.stat span {
-
-  display: block;
-
-  color: var(--muted);
-
-  font-size: 11px;
+.stat span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
 }
 
-
-.stat strong {
-
-  display: block;
-
-  margin-top: 5px;
-
-  font-size: 14px;
+.stat strong{
+  display:block;
+  margin-top:5px;
+  font-size:14px;
 }
 
-
-.how {
-
-  margin-top: 12px;
-
-  padding: 13px;
-
-  border-left:
-    4px solid
-    var(--green);
-
-  background: var(--soft);
-
-  border-radius: 12px;
+.how{
+  margin-top:12px;
+  padding:13px;
+  border-left:4px solid var(--green);
+  background:var(--soft);
+  border-radius:12px;
 }
 
+/* DIAGNOSIS */
 
-/* =========================
-   DIAGNOSIS
-========================= */
-
-.diagnosis {
-
-  grid-column:
-    1 / -1;
+.diagnosis{
+  grid-column:1/-1;
 }
 
-
-.diagnosis-header {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 12px;
+.diagnosis-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
 }
 
-
-.result {
-
-  margin-top: 14px;
-
-  padding: 15px;
-
-  border-radius: 14px;
-
-  background: var(--soft);
-
-  border:
-    1px solid
-    var(--border);
+.result{
+  margin-top:14px;
+  padding:15px;
+  border-radius:14px;
+  background:var(--soft);
+  border:1px solid var(--border);
 }
 
-
-.result-title {
-
-  font-size: 19px;
-
-  font-weight: 800;
-
-  margin-bottom: 5px;
+.result-title{
+  font-size:19px;
+  font-weight:800;
+  margin-bottom:5px;
 }
 
-
-.badge {
-
-  display: inline-block;
-
-  padding:
-    5px
-    9px;
-
-  border-radius: 999px;
-
-  font-size: 11px;
-
-  font-weight: 800;
-
-  margin-bottom: 8px;
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  margin-bottom:8px;
 }
 
-
-.bad {
-
-  background: #ffe0e3;
-
-  color: #a31d2d;
+.good{
+  background:#d9f7e3;
+  color:#087936;
 }
 
-
-.warn {
-
-  background: #fff0d7;
-
-  color: #915800;
+.warn{
+  background:#fff0d7;
+  color:#915800;
 }
 
-
-.good {
-
-  background: #d9f7e3;
-
-  color: #087936;
+.bad{
+  background:#ffe0e3;
+  color:#a31d2d;
 }
 
-
-.progress {
-
-  height: 7px;
-
-  margin-top: 10px;
-
-  background:
-    var(--border);
-
-  border-radius: 20px;
-
-  overflow: hidden;
+.progress{
+  height:7px;
+  margin-top:10px;
+  background:var(--border);
+  border-radius:20px;
+  overflow:hidden;
 }
 
-
-.progress-bar {
-
-  height: 100%;
-
-  width: 0;
-
-  background:
-    var(--green);
-
-  transition:
-    width .5s ease;
+.progress-bar{
+  height:100%;
+  width:0;
+  background:var(--green);
+  transition:.5s;
 }
 
-
-.advice {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 10px;
-
-  margin-top: 12px;
+.advice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
 }
 
-
-.advice-box {
-
-  padding: 12px;
-
-  border-radius: 12px;
-
-  background: var(--card);
-
-  border:
-    1px solid
-    var(--border);
+.advice-box{
+  padding:12px;
+  border-radius:12px;
+  background:var(--card);
+  border:1px solid var(--border);
 }
 
-
-.green-border {
-
-  border-left:
-    4px solid
-    var(--green);
+.green-border{
+  border-left:4px solid var(--green);
 }
 
-
-.danger {
-
-  border-left:
-    4px solid
-    var(--danger);
+.danger{
+  border-left:4px solid var(--danger);
 }
 
+/* LANGUAGE */
 
-/* =========================
-   LANGUAGE
-========================= */
-
-.language-row {
-
-  display: flex;
-
-  gap: 10px;
-
-  margin-top: 12px;
+.language-row{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
 }
 
-
-.language-row .select {
-
-  margin: 0;
-
-  flex: 1;
+.language-row .select{
+  margin:0;
+  flex:1;
 }
 
-
-.voice {
-
-  white-space: nowrap;
+.voice{
+  white-space:nowrap;
 }
 
+/* FOOTER */
 
-/* =========================
-   FOOTER
-========================= */
-
-.footer {
-
-  padding: 20px;
-
-  text-align: center;
-
-  color: var(--muted);
-
-  font-size: 11px;
+.footer{
+  padding:20px;
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
 }
 
+/* MOBILE */
 
-/* =========================
-   MOBILE
-========================= */
+@media(max-width:760px){
 
-@media (max-width: 760px) {
-
-  .grid {
-
-    grid-template-columns:
-      1fr;
-
-    padding: 12px;
+  .grid{
+    grid-template-columns:1fr;
+    padding:12px;
   }
 
-
-  .diagnosis {
-
-    grid-column: auto;
+  .diagnosis{
+    grid-column:auto;
   }
 
-
-  .stats {
-
-    grid-template-columns:
-      repeat(2, 1fr);
+  .stats{
+    grid-template-columns:repeat(2,1fr);
   }
 
-
-  .advice {
-
-    grid-template-columns:
-      1fr;
+  .advice{
+    grid-template-columns:1fr;
   }
 
-
-  .brand {
-
-    font-size: 23px;
-  }
-
-
-  .hero {
-
-    border-radius:
-      0
-      0
-      22px
-      22px;
+  .brand{
+    font-size:23px;
   }
 
 }
 
+@media(max-width:390px){
 
-/* SMALL PHONES */
-
-@media (max-width: 390px) {
-
-  .actions {
-
-    grid-template-columns:
-      1fr;
+  .actions{
+    grid-template-columns:1fr;
   }
 
-
-  .language-row {
-
-    flex-direction: column;
+  .language-row{
+    flex-direction:column;
   }
 
-
-  .voice {
-
-    width: 100%;
+  .voice{
+    width:100%;
   }
 
 }
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <div class="app">
-
-
-<!-- =========================
-     HEADER
-========================= -->
 
 <header class="hero">
 
   <div class="top">
 
     <div>
-
-      <div class="brand">
-        🌱 CropPilot
-      </div>
-
+      <div class="brand">🌱 CropPilot</div>
       <div class="tagline">
         From Field Signals to the Right Action
       </div>
-
     </div>
-
 
     <button
       id="themeButton"
       class="theme-button"
-      type="button"
-      aria-label="Change theme">
-
+      type="button">
       🌙
-
     </button>
 
   </div>
-
 
   <div class="weather-bar">
 
@@ -879,47 +459,26 @@ body {
 
 </header>
 
-
-<!-- LOCATION -->
-
-<div
-  id="farmLocation"
-  class="location">
-
-  📍 Farm location:
-  Detecting...
-
+<div id="farmLocation" class="location">
+  📍 Farm location: Detecting...
 </div>
-
-
-<!-- =========================
-     MAIN
-========================= -->
 
 <main class="grid">
 
-
-<!-- =========================
-     SCAN CROP
-========================= -->
+<!-- CROP SCANNER -->
 
 <section class="card">
 
-  <h2>
-    Scan your crop
-  </h2>
+  <h2>Scan your crop</h2>
 
   <div class="sub">
-    Upload a clear leaf or crop photo
-    for better analysis.
+    Take a photo or select an existing
+    crop photo from your phone.
   </div>
-
 
   <div class="upload-box">
 
-    <div class="camera-icon">
-      📷
-    </div>
+    <div class="camera-icon">📷</div>
 
     <div class="upload-title">
       Take or upload a crop photo
@@ -929,37 +488,23 @@ body {
       Choose Camera or Gallery
     </div>
 
-
     <div class="actions">
-
-
-      <!-- CAMERA BUTTON -->
 
       <button
         id="cameraButton"
         class="btn"
         type="button">
-
         📷 Camera
-
       </button>
-
-
-      <!-- GALLERY BUTTON -->
 
       <button
         id="galleryButton"
         class="btn"
         type="button">
-
         🖼️ Gallery
-
       </button>
 
     </div>
-
-
-    <!-- CAMERA FILE INPUT -->
 
     <input
       id="cameraInput"
@@ -968,171 +513,88 @@ body {
       accept="image/*"
       capture="environment">
 
-
-    <!-- GALLERY FILE INPUT -->
-
     <input
       id="galleryInput"
       class="file-input"
       type="file"
       accept="image/*">
 
-
-    <!-- IMAGE PREVIEW -->
-
     <img
       id="preview"
       class="preview"
-      alt="Selected crop photo">
+      alt="Selected crop">
 
   </div>
 
+  <select id="crop" class="select">
 
-  <!-- CROP -->
-
-  <select
-    id="crop"
-    class="select">
-
-    <option value="Tomato">
-      Tomato
-    </option>
-
-    <option value="Potato">
-      Potato
-    </option>
-
-    <option value="Rice">
-      Rice
-    </option>
-
-    <option value="Chilli">
-      Chilli
-    </option>
-
-    <option value="Cotton">
-      Cotton
-    </option>
-
-    <option value="Maize">
-      Maize
-    </option>
-
-    <option value="Groundnut">
-      Groundnut
-    </option>
-
-    <option value="Other">
-      Other
-    </option>
+    <option value="Tomato">🍅 Tomato</option>
+    <option value="Potato">🥔 Potato</option>
+    <option value="Rice">🌾 Rice</option>
+    <option value="Chilli">🌶️ Chilli</option>
+    <option value="Cotton">🌿 Cotton</option>
+    <option value="Maize">🌽 Maize</option>
+    <option value="Groundnut">🥜 Groundnut</option>
+    <option value="Other">🌱 Other</option>
 
   </select>
-
-
-  <!-- ANALYZE -->
 
   <button
     id="analyzeButton"
     class="btn primary analyze"
     type="button"
     disabled>
-
     🔍 Analyze My Crop
-
   </button>
 
 </section>
 
 
-<!-- =========================
-     FIELD INTELLIGENCE
-========================= -->
+<!-- FIELD INTELLIGENCE -->
 
 <section class="card">
 
-  <h2>
-    Field intelligence
-  </h2>
+  <h2>Field intelligence</h2>
 
   <div class="sub">
     Current conditions around your farm
   </div>
 
-
   <div class="stats">
 
-
     <div class="stat">
-
-      <span>
-        Temperature
-      </span>
-
-      <strong id="temperature">
-        --
-      </strong>
-
+      <span>Temperature</span>
+      <strong id="temperature">--</strong>
     </div>
 
-
     <div class="stat">
-
-      <span>
-        Humidity
-      </span>
-
-      <strong id="humidity">
-        --
-      </strong>
-
+      <span>Humidity</span>
+      <strong id="humidity">--</strong>
     </div>
 
-
     <div class="stat">
-
-      <span>
-        Rain risk
-      </span>
-
-      <strong id="rain">
-        --
-      </strong>
-
+      <span>Rain risk</span>
+      <strong id="rain">--</strong>
     </div>
 
-
     <div class="stat">
-
-      <span>
-        Wind
-      </span>
-
-      <strong id="wind">
-        --
-      </strong>
-
+      <span>Wind</span>
+      <strong id="wind">--</strong>
     </div>
-
 
   </div>
 
-
   <div class="how">
 
-    🌱
-    <strong>
-      How CropPilot works
-    </strong>
+    🌱 <strong>How CropPilot works</strong>
 
     <br>
 
     <span class="sub">
-
       Crop image + crop type +
       field conditions are combined
       to generate an actionable
       field advisory.
-
     </span>
 
   </div>
@@ -1140,75 +602,50 @@ body {
 </section>
 
 
-<!-- =========================
-     DIAGNOSIS
-========================= -->
+<!-- DIAGNOSIS -->
 
 <section class="card diagnosis">
-
 
   <div class="diagnosis-header">
 
     <div>
-
-      <h2>
-        Field diagnosis
-      </h2>
+      <h2>Field diagnosis</h2>
 
       <div class="sub">
         AI-powered crop health analysis
       </div>
-
     </div>
-
 
     <button
       id="speakButton"
       class="btn"
       type="button">
-
       🔊 Speak
-
     </button>
 
   </div>
 
-
-  <div
-    id="result"
-    class="result">
+  <div id="result" class="result">
 
     <div class="result-title">
       Waiting for crop image
     </div>
 
     <div class="sub">
-
-      Upload a crop photo
-      and select Analyze My Crop.
-
+      Upload a crop photo and
+      select Analyze My Crop.
     </div>
 
-
     <div class="progress">
-
       <div
         id="progressBar"
         class="progress-bar">
       </div>
-
     </div>
 
-
-    <div
-      class="sub"
-      style="margin-top:7px">
-
+    <div class="sub" style="margin-top:7px">
       Confidence:
-      <span id="confidence">
-        --
-      </span>
-
+      <span id="confidence">--</span>
     </div>
 
   </div>
@@ -1216,76 +653,55 @@ body {
 </section>
 
 
-<!-- =========================
-     LANGUAGE
-========================= -->
+<!-- LANGUAGE -->
 
 <section class="card">
 
-  <h2>
-    🌐 Farmer language
-  </h2>
+  <h2>🌐 Farmer language</h2>
 
   <div class="sub">
-
     Choose the language for
     the advisory and voice.
-
   </div>
-
 
   <div class="language-row">
 
-
-    <select
-      id="language"
-      class="select">
-
+    <select id="language" class="select">
 
       <option value="English">
         English
       </option>
 
-
       <option value="Telugu">
         తెలుగు (Telugu)
       </option>
-
 
       <option value="Hindi">
         हिन्दी (Hindi)
       </option>
 
-
       <option value="Tamil">
         தமிழ் (Tamil)
       </option>
-
 
       <option value="Kannada">
         ಕನ್ನಡ (Kannada)
       </option>
 
-
     </select>
-
 
     <button
       id="voiceButton"
       class="btn primary voice"
       type="button">
-
       🔊 Voice
-
     </button>
 
   </div>
 
 </section>
 
-
 </main>
-
 
 <footer class="footer">
 
@@ -1299,176 +715,125 @@ body {
 
 </footer>
 
-
 </div>
 
 
 <script>
 
-/* =====================================================
-   CROP PILOT JAVASCRIPT
-===================================================== */
+/* ==========================================
+   CROP PILOT
+========================================== */
+
+"use strict";
 
 
-/* =========================
-   GLOBAL VARIABLES
-========================= */
+/* ==========================================
+   VARIABLES
+========================================== */
 
 let selectedFile = null;
 
 let currentResult = null;
 
-
-let field = {
-
+const field = {
   place: "Unknown",
-
   temperature: null,
-
   humidity: null,
-
   rain: null,
-
   wind: null
-
 };
 
 
-/* =========================
-   THEME
-========================= */
+/* ==========================================
+   ELEMENTS
+========================================== */
 
 const themeButton =
-  document.getElementById(
-    "themeButton"
-  );
+  document.getElementById("themeButton");
+
+const cameraButton =
+  document.getElementById("cameraButton");
+
+const galleryButton =
+  document.getElementById("galleryButton");
+
+const cameraInput =
+  document.getElementById("cameraInput");
+
+const galleryInput =
+  document.getElementById("galleryInput");
+
+const preview =
+  document.getElementById("preview");
+
+const analyzeButton =
+  document.getElementById("analyzeButton");
+
+const result =
+  document.getElementById("result");
 
 
-function applyTheme(theme) {
+/* ==========================================
+   THEME
+========================================== */
 
-  if (theme === "dark") {
+function applyTheme(theme){
 
-    document.body.classList.add(
-      "dark"
-    );
+  if(theme === "dark"){
 
-    themeButton.textContent =
-      "☀️";
+    document.body.classList.add("dark");
 
-  }
+    themeButton.textContent = "☀️";
 
-  else {
+  }else{
 
-    document.body.classList.remove(
-      "dark"
-    );
+    document.body.classList.remove("dark");
 
-    themeButton.textContent =
-      "🌙";
+    themeButton.textContent = "🌙";
 
   }
 
 }
 
 
-/* LOAD SAVED THEME */
+/* Load saved theme */
 
 const savedTheme =
-  localStorage.getItem(
-    "cropPilotTheme"
-  );
+  localStorage.getItem("cropPilotTheme") || "light";
+
+applyTheme(savedTheme);
 
 
-if (savedTheme === "dark") {
-
-  applyTheme("dark");
-
-}
-
-else {
-
-  applyTheme("light");
-
-}
-
-
-/* THEME BUTTON */
+/* Theme button */
 
 themeButton.addEventListener(
   "click",
-  function () {
+  function(){
 
     const dark =
-      document.body.classList.contains(
-        "dark"
-      );
+      document.body.classList.contains("dark");
 
+    const nextTheme =
+      dark ? "light" : "dark";
 
-    const newTheme =
-      dark
-        ? "light"
-        : "dark";
-
-
-    applyTheme(
-      newTheme
-    );
-
+    applyTheme(nextTheme);
 
     localStorage.setItem(
       "cropPilotTheme",
-      newTheme
+      nextTheme
     );
 
   }
 );
 
 
-/* =========================
-   FILE INPUTS
-========================= */
-
-const cameraButton =
-  document.getElementById(
-    "cameraButton"
-  );
-
-
-const galleryButton =
-  document.getElementById(
-    "galleryButton"
-  );
-
-
-const cameraInput =
-  document.getElementById(
-    "cameraInput"
-  );
-
-
-const galleryInput =
-  document.getElementById(
-    "galleryInput"
-  );
-
-
-const preview =
-  document.getElementById(
-    "preview"
-  );
-
-
-const analyzeButton =
-  document.getElementById(
-    "analyzeButton"
-  );
-
-
-/* CAMERA */
+/* ==========================================
+   CAMERA
+========================================== */
 
 cameraButton.addEventListener(
   "click",
-  function () {
+  function(){
 
     cameraInput.value = "";
 
@@ -1478,11 +843,13 @@ cameraButton.addEventListener(
 );
 
 
-/* GALLERY */
+/* ==========================================
+   GALLERY
+========================================== */
 
 galleryButton.addEventListener(
   "click",
-  function () {
+  function(){
 
     galleryInput.value = "";
 
@@ -1492,122 +859,92 @@ galleryButton.addEventListener(
 );
 
 
-/* CAMERA CHANGE */
+/* ==========================================
+   FILE EVENTS
+========================================== */
 
 cameraInput.addEventListener(
   "change",
-  function (event) {
+  function(event){
 
-    const file =
-      event.target.files[0];
-
-    handleSelectedPhoto(
-      file
+    handlePhoto(
+      event.target.files &&
+      event.target.files[0]
     );
 
   }
 );
 
-
-/* GALLERY CHANGE */
 
 galleryInput.addEventListener(
   "change",
-  function (event) {
+  function(event){
 
-    const file =
-      event.target.files[0];
-
-    handleSelectedPhoto(
-      file
+    handlePhoto(
+      event.target.files &&
+      event.target.files[0]
     );
 
   }
 );
 
 
-/* HANDLE PHOTO */
+/* ==========================================
+   PHOTO HANDLER
+========================================== */
 
-function handleSelectedPhoto(file) {
+function handlePhoto(file){
 
-  if (!file) {
+  if(!file){
+    return;
+  }
+
+  if(!file.type.startsWith("image/")){
+
+    alert("Please select an image.");
 
     return;
 
   }
-
-
-  if (
-    !file.type.startsWith(
-      "image/"
-    )
-  ) {
-
-    alert(
-      "Please select an image."
-    );
-
-    return;
-
-  }
-
 
   selectedFile = file;
 
-
-  const imageURL =
-    URL.createObjectURL(
-      file
-    );
-
+  if(preview.src){
+    URL.revokeObjectURL(preview.src);
+  }
 
   preview.src =
-    imageURL;
+    URL.createObjectURL(file);
 
+  preview.style.display = "block";
 
-  preview.style.display =
-    "block";
-
-
-  analyzeButton.disabled =
-    false;
-
+  analyzeButton.disabled = false;
 
   analyzeButton.textContent =
     "🔍 Analyze My Crop";
 
-
-  console.log(
-    "Selected:",
-    file.name
-  );
-
 }
 
 
-/* =========================
+/* ==========================================
    LOCATION
-========================= */
+========================================== */
 
-function getLocation() {
+function getLocation(){
 
-  if (
-    !navigator.geolocation
-  ) {
+  if(!navigator.geolocation){
 
-    document.getElementById(
-      "farmLocation"
-    ).textContent =
-      "📍 Location unavailable";
+    setLocationText(
+      "📍 Location unavailable"
+    );
 
     return;
 
   }
 
-
   navigator.geolocation.getCurrentPosition(
 
-    async function(position) {
+    async function(position){
 
       const lat =
         position.coords.latitude;
@@ -1615,38 +952,25 @@ function getLocation() {
       const lon =
         position.coords.longitude;
 
-
-      await getWeather(
-        lat,
-        lon
-      );
-
-
-      await reverseLocation(
-        lat,
-        lon
-      );
+      await Promise.all([
+        getWeather(lat,lon),
+        getPlace(lat,lon)
+      ]);
 
     },
 
+    function(){
 
-    function() {
-
-      document.getElementById(
-        "farmLocation"
-      ).textContent =
-        "📍 Location permission not granted";
+      setLocationText(
+        "📍 Location permission not granted"
+      );
 
     },
-
 
     {
-      enableHighAccuracy: true,
-
-      timeout: 10000,
-
-      maximumAge: 300000
-
+      enableHighAccuracy:true,
+      timeout:10000,
+      maximumAge:300000
     }
 
   );
@@ -1654,39 +978,37 @@ function getLocation() {
 }
 
 
+function setLocationText(text){
+
+  document.getElementById(
+    "weatherLocation"
+  ).textContent = text;
+
+  document.getElementById(
+    "farmLocation"
+  ).textContent = text;
+
+}
+
+
 getLocation();
 
 
-/* =========================
+/* ==========================================
    WEATHER
-========================= */
+========================================== */
 
-async function getWeather(
-  lat,
-  lon
-) {
+async function getWeather(lat,lon){
 
-  try {
+  try{
 
     const url =
       "https://api.open-meteo.com/v1/forecast" +
-
-      "?latitude=" +
-      lat +
-
-      "&longitude=" +
-      lon +
-
-      "&current=" +
-      "temperature_2m," +
-      "relative_humidity_2m," +
-      "wind_speed_10m" +
-
-      "&hourly=" +
-      "precipitation_probability" +
-
+      "?latitude=" + encodeURIComponent(lat) +
+      "&longitude=" + encodeURIComponent(lon) +
+      "&current=temperature_2m,relative_humidity_2m,wind_speed_10m" +
+      "&hourly=precipitation_probability" +
       "&forecast_days=1" +
-
       "&timezone=auto";
 
 
@@ -1694,12 +1016,8 @@ async function getWeather(
       await fetch(url);
 
 
-    if (!response.ok) {
-
-      throw new Error(
-        "Weather request failed"
-      );
-
+    if(!response.ok){
+      throw new Error("Weather unavailable");
     }
 
 
@@ -1708,81 +1026,100 @@ async function getWeather(
 
 
     const current =
-      data.current;
+      data.current || {};
 
 
     field.temperature =
-      Math.round(
-        current.temperature_2m
-      );
+      Number.isFinite(
+        Number(current.temperature_2m)
+      )
+      ? Math.round(
+          Number(current.temperature_2m)
+        )
+      : null;
 
 
     field.humidity =
-      Math.round(
-        current.relative_humidity_2m
-      );
+      Number.isFinite(
+        Number(current.relative_humidity_2m)
+      )
+      ? Math.round(
+          Number(current.relative_humidity_2m)
+        )
+      : null;
 
 
     field.wind =
-      Math.round(
-        current.wind_speed_10m
-      );
+      Number.isFinite(
+        Number(current.wind_speed_10m)
+      )
+      ? Math.round(
+          Number(current.wind_speed_10m)
+        )
+      : null;
 
 
     const rainValues =
-      data
-        .hourly
-        .precipitation_probability
-        .slice(0, 12);
+      data.hourly &&
+      Array.isArray(
+        data.hourly.precipitation_probability
+      )
+      ? data.hourly
+          .precipitation_probability
+          .slice(0,12)
+      : [];
 
 
     field.rain =
-      Math.max(
-        ...rainValues
-      );
+      rainValues.length
+      ? Math.max(...rainValues)
+      : null;
 
 
     document.getElementById(
       "temperature"
     ).textContent =
-      field.temperature +
-      "°C";
+      field.temperature === null
+      ? "--"
+      : field.temperature + "°C";
 
 
     document.getElementById(
       "humidity"
     ).textContent =
-      field.humidity +
-      "%";
+      field.humidity === null
+      ? "--"
+      : field.humidity + "%";
 
 
     document.getElementById(
       "rain"
     ).textContent =
-      field.rain +
-      "%";
+      field.rain === null
+      ? "--"
+      : field.rain + "%";
 
 
     document.getElementById(
       "wind"
     ).textContent =
-      field.wind +
-      " km/h";
+      field.wind === null
+      ? "--"
+      : field.wind + " km/h";
 
 
     document.getElementById(
       "weatherTemp"
     ).textContent =
-      "🌤️ " +
-      field.temperature +
-      "°C";
+      field.temperature === null
+      ? "🌤️ --°C"
+      : "🌤️ " + field.temperature + "°C";
 
   }
-
-  catch(error) {
+  catch(error){
 
     console.log(
-      "Weather error:",
+      "Weather:",
       error
     );
 
@@ -1791,72 +1128,189 @@ async function getWeather(
 }
 
 
-/* =========================
-   REVERSE LOCATION
-========================= */
+/* ==========================================
+   PLACE
+========================================== */
 
-async function reverseLocation(
-  lat,
-  lon
-) {
+async function getPlace(lat,lon){
 
-  try {
+  try{
 
     const url =
-      "https://geocoding-api.open-meteo.com/v1/reverse" +
-
-      "?latitude=" +
-      lat +
-
-      "&longitude=" +
-      lon +
-
+      "https://geocoding-api.open-meteo.com/v1/search" +
+      "?name=" +
+      encodeURIComponent("Vijayawada") +
       "&count=1" +
-
       "&language=en" +
-
       "&format=json";
 
+    /*
+      We intentionally keep the app usable
+      even if reverse geocoding is unavailable.
+    */
 
     const response =
-      await fetch(url);
+      await fetch(
+        "https://nominatim.openstreetmap.org/reverse" +
+        "?format=jsonv2" +
+        "&lat=" + encodeURIComponent(lat) +
+        "&lon=" + encodeURIComponent(lon)
+      );
+
+
+    if(!response.ok){
+      throw new Error("Place unavailable");
+    }
 
 
     const data =
       await response.json();
 
 
+    const address =
+      data.address || {};
+
+
     const place =
-      data.results &&
-      data.results[0];
+      address.city ||
+      address.town ||
+      address.village ||
+      address.county ||
+      "Your farm";
 
 
-    if (place) {
-
-      field.place =
-        place.name;
+    const state =
+      address.state || "";
 
 
-      if (place.admin1) {
-
-        field.place +=
-          ", " +
-          place.admin1;
-
-      }
-
-    }
+    field.place =
+      state
+      ? place + ", " + state
+      : place;
 
 
     document.getElementById(
       "weatherLocation"
     ).textContent =
-      "📍 " +
-      field.place;
+      "📍 " + field.place;
 
 
     document.getElementById(
       "farmLocation"
     ).textContent =
       "📍 Farm location: " +
- 
+      field.place;
+
+  }
+  catch(error){
+
+    console.log(
+      "Location name:",
+      error
+    );
+
+    document.getElementById(
+      "weatherLocation"
+    ).textContent =
+      "📍 GPS location detected";
+
+    document.getElementById(
+      "farmLocation"
+    ).textContent =
+      "📍 Farm location: GPS detected";
+
+  }
+
+}
+
+
+/* ==========================================
+   IMAGE CONVERSION
+========================================== */
+
+function imageToBase64(file){
+
+  return new Promise(
+    function(resolve,reject){
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(event){
+
+          const img =
+            new Image();
+
+
+          img.onload =
+            function(){
+
+              const max =
+                1600;
+
+
+              const scale =
+                Math.min(
+                  1,
+                  max /
+                  Math.max(
+                    img.width,
+                    img.height
+                  )
+                );
+
+
+              const canvas =
+                document.createElement(
+                  "canvas"
+                );
+
+
+              canvas.width =
+                Math.max(
+                  1,
+                  Math.round(
+                    img.width * scale
+                  )
+                );
+
+
+              canvas.height =
+                Math.max(
+                  1,
+                  Math.round(
+                    img.height * scale
+                  )
+                );
+
+
+              const ctx =
+                canvas.getContext("2d");
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+              );
+
+
+              resolve(
+                canvas.toDataURL(
+                  "image/jpeg",
+                  .82
+                )
+              );
+
+            };
+
+
+          img.onerror =
+            function(){
+
+              reject(
+                n
