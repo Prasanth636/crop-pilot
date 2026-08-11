@@ -1,399 +1,846 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-<meta name="theme-color" content="#008f3d">
+<meta
+  name="theme-color"
+  content="#008f3d"
+>
 
 <title>CropPilot - AI Field Intelligence</title>
 
+
 <style>
+
+/* =========================
+   THEME VARIABLES
+========================= */
+
 :root {
+
   --bg: #eef8f1;
   --card: #ffffff;
   --text: #17352a;
   --muted: #6d8177;
+
   --green: #008f3d;
   --green2: #00b84f;
+
   --soft: #e9f8ee;
-  --border: #d7e8dc;
-  --danger: #e63d4d;
-  --warning: #f39b27;
-  --shadow: 0 8px 24px rgba(16,70,38,.08);
+  --border: #d5e8db;
+
+  --danger: #e5394d;
+  --warning: #f39a23;
+
+  --shadow:
+    0 7px 22px rgba(0, 80, 35, 0.08);
 }
+
+
+/* DARK THEME */
+
+body.dark {
+
+  --bg: #0b1510;
+  --card: #142019;
+  --text: #effff4;
+  --muted: #a8bbb0;
+
+  --soft: #1a3024;
+  --border: #2d4738;
+
+  --shadow:
+    0 7px 22px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================
+   RESET
+========================= */
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
+
+html {
+  scroll-behavior: smooth;
 }
 
+
+body {
+
+  margin: 0;
+
+  background: var(--bg);
+
+  color: var(--text);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  transition:
+    background .25s ease,
+    color .25s ease;
+}
+
+
+/* =========================
+   APP
+========================= */
+
 .app {
+
+  width: 100%;
+
   max-width: 1180px;
+
   min-height: 100vh;
+
   margin: auto;
 }
 
-/* HEADER */
+
+/* =========================
+   HEADER
+========================= */
 
 .hero {
-  background: linear-gradient(135deg, #007d36, #00a947);
+
+  background:
+    linear-gradient(
+      135deg,
+      #007c35,
+      #00a947
+    );
+
   color: white;
-  padding: 22px 20px 18px;
-  border-radius: 0 0 28px 28px;
+
+  padding:
+    20px
+    20px
+    18px;
+
+  border-radius:
+    0
+    0
+    28px
+    28px;
 }
+
 
 .top {
+
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
+  gap: 15px;
 }
 
+
 .brand {
-  font-size: 26px;
+
+  font-size: 27px;
+
   font-weight: 800;
 }
 
+
 .tagline {
+
+  margin-top: 4px;
+
   font-size: 13px;
+
   opacity: .9;
-  margin-top: 3px;
 }
+
 
 .theme-button {
+
+  width: 44px;
+
+  height: 44px;
+
   border: 0;
-  width: 42px;
-  height: 42px;
+
   border-radius: 50%;
-  background: rgba(255,255,255,.18);
+
+  background:
+    rgba(255,255,255,.18);
+
   color: white;
-  font-size: 20px;
+
+  font-size: 21px;
+
+  cursor: pointer;
 }
+
 
 .weather-bar {
+
   margin-top: 18px;
-  padding: 12px 14px;
+
+  padding: 13px 15px;
+
   border-radius: 16px;
-  background: rgba(255,255,255,.13);
+
+  background:
+    rgba(255,255,255,.14);
+
   display: flex;
+
   justify-content: space-between;
+
+  align-items: center;
+
+  gap: 10px;
 }
 
-/* MAIN */
+
+/* =========================
+   LOCATION
+========================= */
 
 .location {
-  padding: 15px 18px 0;
+
+  padding:
+    15px
+    18px
+    0;
+
   color: var(--muted);
+
   font-size: 14px;
 }
 
+
+/* =========================
+   GRID
+========================= */
+
 .grid {
+
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap: 18px;
+
   padding: 18px;
 }
+
+
+/* =========================
+   CARD
+========================= */
 
 .card {
+
   background: var(--card);
-  border: 1px solid var(--border);
+
+  color: var(--text);
+
+  border:
+    1px solid
+    var(--border);
+
   border-radius: 18px;
+
   padding: 18px;
+
   box-shadow: var(--shadow);
+
+  transition:
+    background .25s ease,
+    color .25s ease;
 }
 
+
 .card h2 {
-  margin: 0 0 5px;
+
+  margin:
+    0
+    0
+    5px;
+
   font-size: 20px;
 }
 
+
 .sub {
+
   color: var(--muted);
+
   font-size: 12px;
+
+  line-height: 1.5;
 }
 
-/* UPLOAD */
+
+/* =========================
+   UPLOAD
+========================= */
 
 .upload-box {
+
   margin-top: 14px;
+
   padding: 18px;
+
   text-align: center;
-  border: 2px dashed #9dd9b4;
+
+  border:
+    2px dashed
+    #9bd9b1;
+
   border-radius: 16px;
+
   background: var(--soft);
 }
 
+
 .camera-icon {
+
   font-size: 42px;
+
+  margin-bottom: 5px;
 }
+
 
 .upload-title {
-  margin: 5px 0;
+
   font-size: 18px;
+
   font-weight: 700;
+
+  margin-bottom: 4px;
 }
 
+
 .actions {
+
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap: 10px;
+
   margin-top: 14px;
 }
 
-input[type="file"] {
-  display: none;
+
+/* HIDDEN FILE INPUT */
+
+.file-input {
+
+  position: absolute;
+
+  width: 1px;
+
+  height: 1px;
+
+  opacity: 0;
+
+  pointer-events: none;
 }
+
+
+/* BUTTON */
 
 .btn {
-  border: 1px solid var(--border);
+
+  border:
+    1px solid
+    var(--border);
+
   background: var(--card);
+
   color: var(--text);
+
   border-radius: 12px;
+
   padding: 12px;
+
   font-weight: 700;
+
   cursor: pointer;
+
   text-align: center;
+
+  font-size: 14px;
+
+  transition:
+    .2s ease;
 }
+
+
+.btn:active {
+
+  transform: scale(.98);
+}
+
 
 .primary {
+
   background: var(--green);
+
   color: white;
-  border-color: var(--green);
+
+  border-color:
+    var(--green);
 }
 
+
 .primary:hover {
+
   background: var(--green2);
 }
 
+
 .btn:disabled {
+
   opacity: .55;
+
+  cursor: not-allowed;
 }
+
 
 .select {
+
   width: 100%;
+
   margin-top: 12px;
+
   padding: 13px;
-  border: 1px solid var(--border);
+
+  border:
+    1px solid
+    var(--border);
+
   border-radius: 12px;
+
   background: var(--card);
+
   color: var(--text);
+
+  font-size: 14px;
 }
 
-.analyze {
-  width: 100%;
-  margin-top: 12px;
-}
 
 .preview {
+
   display: none;
+
   width: 100%;
-  max-height: 260px;
+
+  max-height: 280px;
+
   object-fit: cover;
+
   margin-top: 12px;
+
   border-radius: 14px;
+
+  border:
+    1px solid
+    var(--border);
 }
 
-/* FIELD */
+
+.analyze {
+
+  width: 100%;
+
+  margin-top: 12px;
+}
+
+
+/* =========================
+   FIELD INTELLIGENCE
+========================= */
 
 .stats {
+
   display: grid;
-  grid-template-columns: repeat(4,1fr);
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
   gap: 8px;
+
   margin-top: 14px;
 }
+
 
 .stat {
+
   padding: 11px;
+
   text-align: center;
+
   border-radius: 12px;
+
   background: var(--soft);
 }
+
 
 .stat span {
+
   display: block;
+
   color: var(--muted);
+
   font-size: 11px;
 }
 
+
 .stat strong {
+
   display: block;
+
   margin-top: 5px;
+
+  font-size: 14px;
 }
 
+
 .how {
+
   margin-top: 12px;
+
   padding: 13px;
-  border-left: 4px solid var(--green);
+
+  border-left:
+    4px solid
+    var(--green);
+
   background: var(--soft);
+
   border-radius: 12px;
 }
 
-/* DIAGNOSIS */
+
+/* =========================
+   DIAGNOSIS
+========================= */
 
 .diagnosis {
-  grid-column: 1 / -1;
+
+  grid-column:
+    1 / -1;
 }
+
 
 .diagnosis-header {
+
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
+  gap: 12px;
 }
+
 
 .result {
+
   margin-top: 14px;
+
   padding: 15px;
+
   border-radius: 14px;
+
   background: var(--soft);
-  border: 1px solid var(--border);
+
+  border:
+    1px solid
+    var(--border);
 }
+
 
 .result-title {
+
   font-size: 19px;
+
   font-weight: 800;
+
+  margin-bottom: 5px;
 }
 
+
 .badge {
+
   display: inline-block;
-  padding: 5px 9px;
+
+  padding:
+    5px
+    9px;
+
   border-radius: 999px;
+
   font-size: 11px;
+
   font-weight: 800;
+
   margin-bottom: 8px;
 }
 
+
 .bad {
+
   background: #ffe0e3;
-  color: #a21f2d;
+
+  color: #a31d2d;
 }
+
 
 .warn {
-  background: #fff0d8;
-  color: #9a5b00;
+
+  background: #fff0d7;
+
+  color: #915800;
 }
+
 
 .good {
-  background: #d9f7e4;
-  color: #087b36;
+
+  background: #d9f7e3;
+
+  color: #087936;
 }
 
+
 .progress {
+
   height: 7px;
+
   margin-top: 10px;
-  background: var(--border);
+
+  background:
+    var(--border);
+
   border-radius: 20px;
+
   overflow: hidden;
 }
 
+
 .progress-bar {
+
   height: 100%;
+
   width: 0;
-  background: var(--green);
+
+  background:
+    var(--green);
+
+  transition:
+    width .5s ease;
 }
+
 
 .advice {
+
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap: 10px;
+
   margin-top: 12px;
 }
+
 
 .advice-box {
+
   padding: 12px;
+
   border-radius: 12px;
-  background: var(--soft);
+
+  background: var(--card);
+
+  border:
+    1px solid
+    var(--border);
 }
 
-.danger {
-  border-left: 4px solid var(--danger);
-}
 
 .green-border {
-  border-left: 4px solid var(--green);
+
+  border-left:
+    4px solid
+    var(--green);
 }
 
-/* LANGUAGE */
+
+.danger {
+
+  border-left:
+    4px solid
+    var(--danger);
+}
+
+
+/* =========================
+   LANGUAGE
+========================= */
 
 .language-row {
+
   display: flex;
+
   gap: 10px;
+
   margin-top: 12px;
 }
 
+
 .language-row .select {
+
   margin: 0;
+
   flex: 1;
 }
 
+
 .voice {
+
   white-space: nowrap;
 }
 
-/* FOOTER */
+
+/* =========================
+   FOOTER
+========================= */
 
 .footer {
+
   padding: 20px;
+
   text-align: center;
+
   color: var(--muted);
+
   font-size: 11px;
 }
 
-/* DARK */
 
-body.dark {
-  --bg: #0d1712;
-  --card: #14211a;
-  --text: #edf9f0;
-  --muted: #a6b8ae;
-  --soft: #193025;
-  --border: #294136;
-}
+/* =========================
+   MOBILE
+========================= */
 
-/* MOBILE */
-
-@media(max-width:760px) {
+@media (max-width: 760px) {
 
   .grid {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
     padding: 12px;
   }
 
+
   .diagnosis {
+
     grid-column: auto;
   }
 
+
   .stats {
-    grid-template-columns: repeat(2,1fr);
+
+    grid-template-columns:
+      repeat(2, 1fr);
   }
+
 
   .advice {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
   }
 
+
   .brand {
+
     font-size: 23px;
   }
+
+
+  .hero {
+
+    border-radius:
+      0
+      0
+      22px
+      22px;
+  }
+
 }
+
+
+/* SMALL PHONES */
+
+@media (max-width: 390px) {
+
+  .actions {
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .language-row {
+
+    flex-direction: column;
+  }
+
+
+  .voice {
+
+    width: 100%;
+  }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="app">
+
+
+<!-- =========================
+     HEADER
+========================= -->
 
 <header class="hero">
 
   <div class="top">
 
     <div>
+
       <div class="brand">
         🌱 CropPilot
       </div>
@@ -401,15 +848,22 @@ body.dark {
       <div class="tagline">
         From Field Signals to the Right Action
       </div>
+
     </div>
+
 
     <button
       id="themeButton"
-      class="theme-button">
+      class="theme-button"
+      type="button"
+      aria-label="Change theme">
+
       🌙
+
     </button>
 
   </div>
+
 
   <div class="weather-bar">
 
@@ -426,18 +880,28 @@ body.dark {
 </header>
 
 
+<!-- LOCATION -->
+
 <div
   id="farmLocation"
   class="location">
 
-  📍 Farm location: Detecting...
+  📍 Farm location:
+  Detecting...
 
 </div>
 
 
+<!-- =========================
+     MAIN
+========================= -->
+
 <main class="grid">
 
-<!-- SCAN -->
+
+<!-- =========================
+     SCAN CROP
+========================= -->
 
 <section class="card">
 
@@ -446,7 +910,8 @@ body.dark {
   </h2>
 
   <div class="sub">
-    Upload a clear leaf or crop photo for better analysis.
+    Upload a clear leaf or crop photo
+    for better analysis.
   </div>
 
 
@@ -467,70 +932,109 @@ body.dark {
 
     <div class="actions">
 
-      <label
+
+      <!-- CAMERA BUTTON -->
+
+      <button
+        id="cameraButton"
         class="btn"
-        for="cameraInput">
+        type="button">
 
         📷 Camera
 
-      </label>
+      </button>
 
 
-      <label
+      <!-- GALLERY BUTTON -->
+
+      <button
+        id="galleryButton"
         class="btn"
-        for="galleryInput">
+        type="button">
 
         🖼️ Gallery
 
-      </label>
+      </button>
 
     </div>
 
 
-    <!-- CAMERA -->
+    <!-- CAMERA FILE INPUT -->
 
     <input
       id="cameraInput"
+      class="file-input"
       type="file"
       accept="image/*"
       capture="environment">
 
 
-    <!-- GALLERY -->
+    <!-- GALLERY FILE INPUT -->
 
     <input
       id="galleryInput"
+      class="file-input"
       type="file"
       accept="image/*">
 
 
+    <!-- IMAGE PREVIEW -->
+
     <img
       id="preview"
       class="preview"
-      alt="Crop preview">
+      alt="Selected crop photo">
 
   </div>
 
+
+  <!-- CROP -->
 
   <select
     id="crop"
     class="select">
 
-    <option>Tomato</option>
-    <option>Potato</option>
-    <option>Rice</option>
-    <option>Chilli</option>
-    <option>Cotton</option>
-    <option>Maize</option>
-    <option>Groundnut</option>
-    <option>Other</option>
+    <option value="Tomato">
+      Tomato
+    </option>
+
+    <option value="Potato">
+      Potato
+    </option>
+
+    <option value="Rice">
+      Rice
+    </option>
+
+    <option value="Chilli">
+      Chilli
+    </option>
+
+    <option value="Cotton">
+      Cotton
+    </option>
+
+    <option value="Maize">
+      Maize
+    </option>
+
+    <option value="Groundnut">
+      Groundnut
+    </option>
+
+    <option value="Other">
+      Other
+    </option>
 
   </select>
 
 
+  <!-- ANALYZE -->
+
   <button
     id="analyzeButton"
     class="btn primary analyze"
+    type="button"
     disabled>
 
     🔍 Analyze My Crop
@@ -540,7 +1044,9 @@ body.dark {
 </section>
 
 
-<!-- FIELD INTELLIGENCE -->
+<!-- =========================
+     FIELD INTELLIGENCE
+========================= -->
 
 <section class="card">
 
@@ -555,32 +1061,66 @@ body.dark {
 
   <div class="stats">
 
-    <div class="stat">
-      <span>Temperature</span>
-      <strong id="temperature">--</strong>
-    </div>
 
     <div class="stat">
-      <span>Humidity</span>
-      <strong id="humidity">--</strong>
+
+      <span>
+        Temperature
+      </span>
+
+      <strong id="temperature">
+        --
+      </strong>
+
     </div>
 
-    <div class="stat">
-      <span>Rain risk</span>
-      <strong id="rain">--</strong>
-    </div>
 
     <div class="stat">
-      <span>Wind</span>
-      <strong id="wind">--</strong>
+
+      <span>
+        Humidity
+      </span>
+
+      <strong id="humidity">
+        --
+      </strong>
+
     </div>
+
+
+    <div class="stat">
+
+      <span>
+        Rain risk
+      </span>
+
+      <strong id="rain">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Wind
+      </span>
+
+      <strong id="wind">
+        --
+      </strong>
+
+    </div>
+
 
   </div>
 
 
   <div class="how">
 
-    🌱 <strong>
+    🌱
+    <strong>
       How CropPilot works
     </strong>
 
@@ -600,9 +1140,12 @@ body.dark {
 </section>
 
 
-<!-- DIAGNOSIS -->
+<!-- =========================
+     DIAGNOSIS
+========================= -->
 
 <section class="card diagnosis">
+
 
   <div class="diagnosis-header">
 
@@ -621,7 +1164,8 @@ body.dark {
 
     <button
       id="speakButton"
-      class="btn">
+      class="btn"
+      type="button">
 
       🔊 Speak
 
@@ -639,9 +1183,12 @@ body.dark {
     </div>
 
     <div class="sub">
-      Upload a crop photo and select
-      Analyze My Crop.
+
+      Upload a crop photo
+      and select Analyze My Crop.
+
     </div>
+
 
     <div class="progress">
 
@@ -651,6 +1198,7 @@ body.dark {
       </div>
 
     </div>
+
 
     <div
       class="sub"
@@ -668,7 +1216,9 @@ body.dark {
 </section>
 
 
-<!-- LANGUAGE -->
+<!-- =========================
+     LANGUAGE
+========================= -->
 
 <section class="card">
 
@@ -677,42 +1227,53 @@ body.dark {
   </h2>
 
   <div class="sub">
-    Choose the language for the advisory and voice.
+
+    Choose the language for
+    the advisory and voice.
+
   </div>
 
 
   <div class="language-row">
 
+
     <select
       id="language"
       class="select">
+
 
       <option value="English">
         English
       </option>
 
+
       <option value="Telugu">
         తెలుగు (Telugu)
       </option>
+
 
       <option value="Hindi">
         हिन्दी (Hindi)
       </option>
 
+
       <option value="Tamil">
         தமிழ் (Tamil)
       </option>
 
+
       <option value="Kannada">
         ಕನ್ನಡ (Kannada)
       </option>
+
 
     </select>
 
 
     <button
       id="voiceButton"
-      class="btn primary voice">
+      class="btn primary voice"
+      type="button">
 
       🔊 Voice
 
@@ -722,138 +1283,317 @@ body.dark {
 
 </section>
 
+
 </main>
 
 
 <footer class="footer">
 
-  CropPilot AI • Field intelligence for better decisions
+  CropPilot AI • Field intelligence
+  for better decisions
 
   <br><br>
 
-  AI advice should be verified with local
-  agricultural guidance.
+  AI advice should be verified
+  with local agricultural guidance.
 
 </footer>
+
 
 </div>
 
 
 <script>
 
+/* =====================================================
+   CROP PILOT JAVASCRIPT
+===================================================== */
+
+
+/* =========================
+   GLOBAL VARIABLES
+========================= */
+
 let selectedFile = null;
+
 let currentResult = null;
 
+
 let field = {
+
   place: "Unknown",
+
   temperature: null,
+
   humidity: null,
+
   rain: null,
+
   wind: null
+
 };
 
 
-/* THEME */
+/* =========================
+   THEME
+========================= */
 
 const themeButton =
-  document.getElementById("themeButton");
-
-function setTheme(dark) {
-
-  document.body.classList.toggle(
-    "dark",
-    dark
+  document.getElementById(
+    "themeButton"
   );
 
-  themeButton.textContent =
-    dark ? "☀️" : "🌙";
 
-  localStorage.setItem(
-    "cropPilotTheme",
-    dark ? "dark" : "light"
-  );
-}
+function applyTheme(theme) {
 
-setTheme(
-  localStorage.getItem("cropPilotTheme") === "dark"
-);
+  if (theme === "dark") {
 
-themeButton.onclick = function() {
+    document.body.classList.add(
+      "dark"
+    );
 
-  setTheme(
-    !document.body.classList.contains("dark")
-  );
+    themeButton.textContent =
+      "☀️";
 
-};
-
-
-/* FILE UPLOAD */
-
-const cameraInput =
-  document.getElementById("cameraInput");
-
-const galleryInput =
-  document.getElementById("galleryInput");
-
-const preview =
-  document.getElementById("preview");
-
-const analyzeButton =
-  document.getElementById("analyzeButton");
-
-
-function handleFile(file) {
-
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-
-    alert("Please select an image.");
-
-    return;
   }
 
-  selectedFile = file;
+  else {
 
-  preview.src =
-    URL.createObjectURL(file);
+    document.body.classList.remove(
+      "dark"
+    );
 
-  preview.style.display = "block";
+    themeButton.textContent =
+      "🌙";
 
-  analyzeButton.disabled = false;
+  }
 
 }
 
+
+/* LOAD SAVED THEME */
+
+const savedTheme =
+  localStorage.getItem(
+    "cropPilotTheme"
+  );
+
+
+if (savedTheme === "dark") {
+
+  applyTheme("dark");
+
+}
+
+else {
+
+  applyTheme("light");
+
+}
+
+
+/* THEME BUTTON */
+
+themeButton.addEventListener(
+  "click",
+  function () {
+
+    const dark =
+      document.body.classList.contains(
+        "dark"
+      );
+
+
+    const newTheme =
+      dark
+        ? "light"
+        : "dark";
+
+
+    applyTheme(
+      newTheme
+    );
+
+
+    localStorage.setItem(
+      "cropPilotTheme",
+      newTheme
+    );
+
+  }
+);
+
+
+/* =========================
+   FILE INPUTS
+========================= */
+
+const cameraButton =
+  document.getElementById(
+    "cameraButton"
+  );
+
+
+const galleryButton =
+  document.getElementById(
+    "galleryButton"
+  );
+
+
+const cameraInput =
+  document.getElementById(
+    "cameraInput"
+  );
+
+
+const galleryInput =
+  document.getElementById(
+    "galleryInput"
+  );
+
+
+const preview =
+  document.getElementById(
+    "preview"
+  );
+
+
+const analyzeButton =
+  document.getElementById(
+    "analyzeButton"
+  );
+
+
+/* CAMERA */
+
+cameraButton.addEventListener(
+  "click",
+  function () {
+
+    cameraInput.value = "";
+
+    cameraInput.click();
+
+  }
+);
+
+
+/* GALLERY */
+
+galleryButton.addEventListener(
+  "click",
+  function () {
+
+    galleryInput.value = "";
+
+    galleryInput.click();
+
+  }
+);
+
+
+/* CAMERA CHANGE */
 
 cameraInput.addEventListener(
   "change",
-  function(event) {
+  function (event) {
 
-    handleFile(
-      event.target.files[0]
+    const file =
+      event.target.files[0];
+
+    handleSelectedPhoto(
+      file
     );
 
   }
 );
 
+
+/* GALLERY CHANGE */
 
 galleryInput.addEventListener(
   "change",
-  function(event) {
+  function (event) {
 
-    handleFile(
-      event.target.files[0]
+    const file =
+      event.target.files[0];
+
+    handleSelectedPhoto(
+      file
     );
 
   }
 );
 
 
-/* LOCATION */
+/* HANDLE PHOTO */
+
+function handleSelectedPhoto(file) {
+
+  if (!file) {
+
+    return;
+
+  }
+
+
+  if (
+    !file.type.startsWith(
+      "image/"
+    )
+  ) {
+
+    alert(
+      "Please select an image."
+    );
+
+    return;
+
+  }
+
+
+  selectedFile = file;
+
+
+  const imageURL =
+    URL.createObjectURL(
+      file
+    );
+
+
+  preview.src =
+    imageURL;
+
+
+  preview.style.display =
+    "block";
+
+
+  analyzeButton.disabled =
+    false;
+
+
+  analyzeButton.textContent =
+    "🔍 Analyze My Crop";
+
+
+  console.log(
+    "Selected:",
+    file.name
+  );
+
+}
+
+
+/* =========================
+   LOCATION
+========================= */
 
 function getLocation() {
 
-  if (!navigator.geolocation) {
+  if (
+    !navigator.geolocation
+  ) {
 
     document.getElementById(
       "farmLocation"
@@ -881,12 +1621,14 @@ function getLocation() {
         lon
       );
 
+
       await reverseLocation(
         lat,
         lon
       );
 
     },
+
 
     function() {
 
@@ -897,9 +1639,14 @@ function getLocation() {
 
     },
 
+
     {
       enableHighAccuracy: true,
-      timeout: 10000
+
+      timeout: 10000,
+
+      maximumAge: 300000
+
     }
 
   );
@@ -907,27 +1654,54 @@ function getLocation() {
 }
 
 
-/* WEATHER */
+getLocation();
 
-async function getWeather(lat, lon) {
+
+/* =========================
+   WEATHER
+========================= */
+
+async function getWeather(
+  lat,
+  lon
+) {
 
   try {
 
     const url =
       "https://api.open-meteo.com/v1/forecast" +
-      "?latitude=" + lat +
-      "&longitude=" + lon +
+
+      "?latitude=" +
+      lat +
+
+      "&longitude=" +
+      lon +
+
       "&current=" +
       "temperature_2m," +
       "relative_humidity_2m," +
       "wind_speed_10m" +
-      "&hourly=precipitation_probability" +
+
+      "&hourly=" +
+      "precipitation_probability" +
+
       "&forecast_days=1" +
+
       "&timezone=auto";
 
 
     const response =
       await fetch(url);
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Weather request failed"
+      );
+
+    }
+
 
     const data =
       await response.json();
@@ -942,10 +1716,12 @@ async function getWeather(lat, lon) {
         current.temperature_2m
       );
 
+
     field.humidity =
       Math.round(
         current.relative_humidity_2m
       );
+
 
     field.wind =
       Math.round(
@@ -954,9 +1730,10 @@ async function getWeather(lat, lon) {
 
 
     const rainValues =
-      data.hourly
+      data
+        .hourly
         .precipitation_probability
-        .slice(0,12);
+        .slice(0, 12);
 
 
     field.rain =
@@ -968,25 +1745,29 @@ async function getWeather(lat, lon) {
     document.getElementById(
       "temperature"
     ).textContent =
-      field.temperature + "°C";
+      field.temperature +
+      "°C";
 
 
     document.getElementById(
       "humidity"
     ).textContent =
-      field.humidity + "%";
+      field.humidity +
+      "%";
 
 
     document.getElementById(
       "rain"
     ).textContent =
-      field.rain + "%";
+      field.rain +
+      "%";
 
 
     document.getElementById(
       "wind"
     ).textContent =
-      field.wind + " km/h";
+      field.wind +
+      " km/h";
 
 
     document.getElementById(
@@ -1000,14 +1781,19 @@ async function getWeather(lat, lon) {
 
   catch(error) {
 
-    console.log(error);
+    console.log(
+      "Weather error:",
+      error
+    );
 
   }
 
 }
 
 
-/* LOCATION NAME */
+/* =========================
+   REVERSE LOCATION
+========================= */
 
 async function reverseLocation(
   lat,
@@ -1018,15 +1804,23 @@ async function reverseLocation(
 
     const url =
       "https://geocoding-api.open-meteo.com/v1/reverse" +
-      "?latitude=" + lat +
-      "&longitude=" + lon +
+
+      "?latitude=" +
+      lat +
+
+      "&longitude=" +
+      lon +
+
       "&count=1" +
+
       "&language=en" +
+
       "&format=json";
 
 
     const response =
       await fetch(url);
+
 
     const data =
       await response.json();
@@ -1040,9 +1834,16 @@ async function reverseLocation(
     if (place) {
 
       field.place =
-        place.name +
-        ", " +
-        (place.admin1 || "");
+        place.name;
+
+
+      if (place.admin1) {
+
+        field.place +=
+          ", " +
+          place.admin1;
+
+      }
 
     }
 
@@ -1050,422 +1851,12 @@ async function reverseLocation(
     document.getElementById(
       "weatherLocation"
     ).textContent =
-      "📍 " + field.place;
+      "📍 " +
+      field.place;
 
 
     document.getElementById(
       "farmLocation"
     ).textContent =
       "📍 Farm location: " +
-      field.place;
-
-  }
-
-  catch(error) {
-
-    console.log(error);
-
-  }
-
-}
-
-
-getLocation();
-
-
-/* ANALYZE */
-
-analyzeButton.onclick =
-  async function() {
-
-    if (!selectedFile) {
-
-      alert(
-        "Please choose a crop image first."
-      );
-
-      return;
-
-    }
-
-
-    analyzeButton.disabled = true;
-
-    analyzeButton.textContent =
-      "⏳ Analyzing...";
-
-
-    const result =
-      document.getElementById("result");
-
-
-    result.innerHTML =
-
-      "<div class='result-title'>" +
-      "Analyzing your crop..." +
-      "</div>" +
-
-      "<div class='sub'>" +
-      "Please wait." +
-      "</div>" +
-
-      "<div class='progress'>" +
-      "<div class='progress-bar' " +
-      "style='width:40%'>" +
-      "</div></div>";
-
-
-    try {
-
-      const image =
-        await convertImage(
-          selectedFile
-        );
-
-
-      const payload = {
-
-        image: image,
-
-        crop:
-          document.getElementById(
-            "crop"
-          ).value,
-
-        language:
-          document.getElementById(
-            "language"
-          ).value,
-
-        location:
-          field.place,
-
-        weather: {
-
-          temperature:
-            field.temperature,
-
-          humidity:
-            field.humidity,
-
-          rainRisk:
-            field.rain,
-
-          wind:
-            field.wind
-
-        }
-
-      };
-
-
-      const response =
-        await fetch(
-          "/api/analyze",
-          {
-
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body:
-              JSON.stringify(payload)
-
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          data.error ||
-          "Analysis failed."
-        );
-
-      }
-
-
-      showResult(data);
-
-    }
-
-    catch(error) {
-
-      result.innerHTML =
-
-        "<div class='result-title'>" +
-        "Analysis unavailable" +
-        "</div>" +
-
-        "<div class='sub'>" +
-        error.message +
-        "</div>";
-
-    }
-
-
-    analyzeButton.disabled = false;
-
-    analyzeButton.textContent =
-      "🔍 Analyze My Crop";
-
-  };
-
-
-/* IMAGE CONVERSION */
-
-function convertImage(file) {
-
-  return new Promise(
-    function(resolve, reject) {
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function(event) {
-
-          const image =
-            new Image();
-
-
-          image.onload =
-            function() {
-
-              const max =
-                1600;
-
-
-              const scale =
-                Math.min(
-                  1,
-                  max /
-                  Math.max(
-                    image.width,
-                    image.height
-                  )
-                );
-
-
-              const canvas =
-                document.createElement(
-                  "canvas"
-                );
-
-
-              canvas.width =
-                image.width * scale;
-
-              canvas.height =
-                image.height * scale;
-
-
-              const ctx =
-                canvas.getContext(
-                  "2d"
-                );
-
-
-              ctx.drawImage(
-                image,
-                0,
-                0,
-                canvas.width,
-                canvas.height
-              );
-
-
-              resolve(
-                canvas.toDataURL(
-                  "image/jpeg",
-                  .82
-                )
-              );
-
-            };
-
-
-          image.onerror =
-            reject;
-
-
-          image.src =
-            event.target.result;
-
-        };
-
-
-      reader.onerror =
-        reject;
-
-
-      reader.readAsDataURL(file);
-
-    }
-  );
-
-}
-
-
-/* SHOW RESULT */
-
-function showResult(data) {
-
-  currentResult = data;
-
-
-  const confidence =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        Number(data.confidence) || 0
-      )
-    );
-
-
-  let severity =
-    (data.severity || "moderate")
-    .toLowerCase();
-
-
-  let badgeClass =
-    "warn";
-
-
-  if (
-    severity === "healthy" ||
-    severity === "low"
-  ) {
-
-    badgeClass = "good";
-
-  }
-
-
-  if (
-    severity === "high" ||
-    severity === "severe"
-  ) {
-
-    badgeClass = "bad";
-
-  }
-
-
-  const result =
-    document.getElementById("result");
-
-
-  result.innerHTML =
-
-    "<span class='badge " +
-    badgeClass +
-    "'>" +
-
-    escapeHtml(
-      severity.toUpperCase()
-    ) +
-
-    "</span>" +
-
-
-    "<div class='result-title'>" +
-
-    escapeHtml(
-      data.diagnosis ||
-      "Crop condition detected"
-    ) +
-
-    "</div>" +
-
-
-    "<div class='sub'>" +
-
-    escapeHtml(
-      data.summary || ""
-    ) +
-
-    "</div>" +
-
-
-    "<div class='progress'>" +
-
-    "<div id='progressBar' " +
-    "class='progress-bar'></div>" +
-
-    "</div>" +
-
-
-    "<div class='sub' " +
-    "style='margin-top:7px'>" +
-
-    "Confidence: " +
-
-    confidence +
-
-    "%" +
-
-    "</div>" +
-
-
-    "<div class='advice'>" +
-
-
-    "<div class='advice-box green-border'>" +
-
-    "<strong>🌱 What to do now</strong><br>" +
-
-    "<span class='sub'>" +
-
-    escapeHtml(
-      data.action ||
-      "Follow locally approved guidance."
-    ) +
-
-    "</span>" +
-
-    "</div>" +
-
-
-    "<div class='advice-box danger'>" +
-
-    "<strong>" +
-
-    (
-      data.spray_now === fals
-      ? "🚫 Don't spray now"
-      : "🧪 Treatment guidance"
-    ) +
-
-    "</strong><br>" +
-
-    "<span class='sub'>" +
-
-    escapeHtml(
-      data.treatment ||
-      "Follow local agricultural guidance."
-    ) +
-
-    "</span>" +
-
-    "</div>" +
-
-
-    "<div class='advice-box green-border'>" +
-
-    "<strong>💡 Why CropPilot thinks this</strong><br>" +
-
-    "<span class='sub'>" +
-
-    escapeHtml(
-      data.reason ||
-      "Visup
+ 
