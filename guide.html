@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  name="theme-color"
+  content="#008f3d"
+>
+
+<meta
+  name="description"
+  content="CropPilot farmer guide"
+>
+
+<title>CropPilot — Farmer Guide</title>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+<body>
+
+<a class="skip-link" href="#main">
+  Skip to main content
+</a>
+
+
+<div class="app">
+
+
+<header class="hero">
+
+  <div class="top">
+
+    <a href="index.html" class="brand">
+      <span aria-hidden="true">🌱</span> CropPilot
+    </a>
+
+    <button
+      id="themeButton"
+      class="theme-button"
+      type="button"
+      aria-label="Switch theme"
+    >
+      🌙
+    </button>
+
+  </div>
+
+  <div class="tagline">
+    A simple guide for better crop decisions
+  </div>
+
+</header>
+
+
+<nav
+  class="main-nav"
+  aria-label="Main navigation"
+>
+
+  <a href="index.html">
+    <span aria-hidden="true">🏠</span> Dashboard
+  </a>
+
+  <a href="scan.html">
+    <span aria-hidden="true">📷</span> Scan
+  </a>
+
+  <a href="history.html">
+    <span aria-hidden="true">🗂️</span> History
+  </a>
+
+  <a href="field.html">
+    <span aria-hidden="true">📍</span> Field
+  </a>
+
+  <a
+    href="guide.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">📘</span> Guide
+  </a>
+
+</nav>
+
+
+<div
+  id="liveStatus"
+  class="sr-only"
+  aria-live="polite"
+></div>
+
+
+<main id="main" class="content">
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    FARMER GUIDE
+  </div>
+
+  <h1>
+    Get a better crop analysis
+  </h1>
+
+  <p class="muted">
+    A good photo produces better visual evidence.
+    Follow these simple steps before scanning.
+  </p>
+
+</section>
+
+
+<section class="card">
+
+  <h2>
+    <span aria-hidden="true">📷</span> 1. Take a clear photo
+  </h2>
+
+  <div class="steps">
+
+
+    <div class="step">
+
+      <div class="step-number">
+        DO
+      </div>
+
+      <strong>
+        Good lighting
+      </strong>
+
+      <p class="muted">
+        Take the photo in daylight where possible.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        DO
+      </div>
+
+      <strong>
+        Focus on the plant
+      </strong>
+
+      <p class="muted">
+        Keep leaves, stems or affected areas visible.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        DO
+      </div>
+
+      <strong>
+        Keep it steady
+      </strong>
+
+      <p class="muted">
+        Avoid blurry images.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        AVOID
+      </div>
+
+      <strong>
+        Random photos
+      </strong>
+
+      <p class="muted">
+        CropPilot will reject images that do not
+        appear to contain a plant or crop.
+      </p>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <h2>
+    <span aria-hidden="true">🌱</span> 2. Select the correct crop
+  </h2>
+
+  <p class="muted">
+    Choose the crop that appears in the image.
+    If the selected crop does not match the image,
+    CropPilot will warn you rather than silently
+    assuming the selection is correct.
+  </p>
+
+</section>
+
+
+<section class="card">
+
+  <h2>
+    <span aria-hidden="true">🔬</span> 3. Understand the AI result
+  </h2>
+
+
+  <div class="result">
+
+    <div class="result-title">
+      Confidence
+    </div>
+
+    <p class="muted">
+      Confidence represents how strongly the
+      model supports its visual assessment.
+      It is not a guarantee of diagnosis.
+    </p>
+
+  </div>
+
+
+  <div class="result">
+
+    <div class="result-title">
+      Severity
+    </div>
+
+    <p class="muted">
+      Healthy, Watch, Concern or Unknown helps
+      prioritize what deserves attention.
+    </p>
+
+  </div>
+
+
+  <div class="result">
+
+    <div class="result-title">
+      Recommended action
+    </div>
+
+    <p class="muted">
+      CropPilot focuses on practical next steps
+      instead of unsafe chemical prescriptions.
+    </p>
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <h2>
+    <span aria-hidden="true">🛡️</span> 4. Use AI responsibly
+  </h2>
+
+  <p class="muted">
+
+    CropPilot is a first-line visual triage tool.
+    A photograph cannot replace laboratory testing,
+    an agricultural expert or local field inspection.
+
+  </p>
+
+
+  <ul>
+
+    <li>
+      Verify important diagnoses.
+    </li>
+
+    <li>
+      Follow local agricultural guidance.
+    </li>
+
+    <li>
+      Follow product labels for any approved treatment.
+    </li>
+
+    <li>
+      Do not apply chemicals based only on an AI result.
+    </li>
+
+  </ul>
+
+</section>
+
+
+<section class="card">
+
+  <h2>
+    <span aria-hidden="true">🌐</span> 5. Choose your language
+  </h2>
+
+  <p class="muted">
+
+    CropPilot supports:
+
+  </p>
+
+
+  <div class="quick-grid">
+
+
+    <div class="quick-card">
+
+      <span aria-hidden="true">🇬🇧</span>
+
+      <strong>
+        English
+      </strong>
+
+      <small>
+        English advisory
+      </small>
+
+    </div>
+
+
+    <div class="quick-card">
+
+      <span aria-hidden="true">🇮🇳</span>
+
+      <strong>
+        తెలుగు
+      </strong>
+
+      <small>
+        Telugu advisory
+      </small>
+
+    </div>
+
+
+    <div class="quick-card">
+
+      <span aria-hidden="true">🇮🇳</span>
+
+      <strong>
+        हिन्दी
+      </strong>
+
+      <small>
+        Hindi advisory
+      </small>
+
+    </div>
+
+
+    <div class="quick-card">
+
+      <span aria-hidden="true">🇮🇳</span>
+
+      <strong>
+        தமிழ் / ಕನ್ನಡ
+      </strong>
+
+      <small>
+        Tamil and Kannada
+      </small>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <h2>
+    <span aria-hidden="true">🔊</span> Voice advisory
+  </h2>
+
+  <p class="muted">
+    After an analysis, use the Voice button
+    to hear the advisory in the selected language.
+  </p>
+
+  <a
+    href="scan.html"
+    class="btn primary"
+  >
+    <span aria-hidden="true">📷</span> Try a Crop Scan
+  </a>
+
+</section>
+
+
+</main>
+
+
+<footer class="footer">
+
+  <strong>
+    <span aria-hidden="true">🌱</span> CropPilot AI
+  </strong>
+
+  <p>
+    AI advice should be verified with
+    local agricultural guidance.
+  </p>
+
+</footer>
+
+
+<nav
+  class="mobile-nav"
+  aria-label="Mobile navigation"
+>
+
+  <a href="index.html">
+    <span aria-hidden="true">🏠</span>
+    <span>Home</span>
+  </a>
+
+  <a href="scan.html">
+    <span aria-hidden="true">📷</span>
+    <span>Scan</span>
+  </a>
+
+  <a href="history.html">
+    <span aria-hidden="true">🗂️</span>
+    <span>History</span>
+  </a>
+
+  <a href="field.html">
+    <span aria-hidden="true">📍</span>
+    <span>Field</span>
+  </a>
+
+</nav>
+
+
+</div>
+
+
+<script type="module" src="app.js"></script>
+
+</body>
+
+</html>
