@@ -15,560 +15,60 @@
   content="#008f3d"
 >
 
-<title>CropPilot - AI Field Intelligence</title>
-
-<style>
-
-:root {
-  --bg: #eef8f1;
-  --card: #ffffff;
-  --text: #17352a;
-  --muted: #6d8177;
-  --green: #008f3d;
-  --green2: #00b84f;
-  --soft: #e9f8ee;
-  --border: #cfe5d7;
-  --danger: #d93045;
-  --warning: #d88900;
-  --shadow: 0 6px 20px rgba(0,80,35,.08);
-}
-
-body.dark {
-  --bg: #0b1510;
-  --card: #142019;
-  --text: #effff4;
-  --muted: #a8bbb0;
-  --green: #00a846;
-  --green2: #00c95a;
-  --soft: #1a3024;
-  --border: #2d4738;
-  --shadow: 0 6px 20px rgba(0,0,0,.35);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-  transition: background .25s, color .25s;
-}
-
-button,
-select {
-  font-family: inherit;
-}
-
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.app {
-  width: 100%;
-  max-width: 1180px;
-  min-height: 100vh;
-  margin: auto;
-}
-
-/* ================= HEADER ================= */
-
-.hero {
-  background: linear-gradient(
-    135deg,
-    #007c35,
-    #00a947
-  );
-
-  color: white;
-
-  padding: 20px;
-
-  border-radius:
-    0 0 28px 28px;
-}
-
-.top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.brand {
-  font-size: 26px;
-  font-weight: 800;
-}
-
-.tagline {
-  margin-top: 4px;
-  font-size: 13px;
-  opacity: .9;
-}
-
-.theme-button {
-  width: 45px;
-  height: 45px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255,255,255,.18);
-  color: white;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-.weather-bar {
-  margin-top: 17px;
-  padding: 13px 15px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.14);
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-
-  font-size: 14px;
-}
-
-/* ================= LOCATION ================= */
-
-.location {
-  padding: 15px 18px 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-/* ================= GRID ================= */
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  padding: 18px;
-}
-
-/* ================= CARD ================= */
-
-.card {
-  background: var(--card);
-  color: var(--text);
-
-  border: 1px solid var(--border);
-  border-radius: 18px;
-
-  padding: 18px;
-
-  box-shadow: var(--shadow);
-
-  transition:
-    background .25s,
-    color .25s;
-}
-
-.card h2 {
-  margin: 0 0 5px;
-  font-size: 20px;
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-/* ================= UPLOAD ================= */
-
-.upload-box {
-  margin-top: 14px;
-  padding: 18px;
-
-  text-align: center;
-
-  border:
-    2px dashed
-    #9bd9b1;
-
-  border-radius: 16px;
-
-  background: var(--soft);
-}
-
-.camera-icon {
-  font-size: 42px;
-  margin-bottom: 5px;
-}
-
-.upload-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.btn {
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-
-  border-radius: 12px;
-  padding: 12px;
-
-  font-weight: 700;
-  cursor: pointer;
-
-  text-align: center;
-  font-size: 14px;
-
-  transition: .2s ease;
-}
-
-.btn:active {
-  transform: scale(.98);
-}
-
-.primary {
-  background: var(--green);
-  color: white;
-  border-color: var(--green);
-}
-
-.primary:hover {
-  background: var(--green2);
-}
-
-.btn:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-.select {
-  width: 100%;
-
-  margin-top: 12px;
-
-  padding: 13px;
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: 12px;
-
-  background: var(--card);
-  color: var(--text);
-
-  font-size: 14px;
-}
-
-.preview {
-  display: none;
-
-  width: 100%;
-  max-height: 300px;
-
-  object-fit: cover;
-
-  margin-top: 12px;
-
-  border-radius: 14px;
-
-  border:
-    1px solid
-    var(--border);
-}
-
-.analyze {
-  width: 100%;
-  margin-top: 12px;
-}
-
-/* ================= STATS ================= */
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.stat {
-  padding: 11px;
-  text-align: center;
-  border-radius: 12px;
-  background: var(--soft);
-}
-
-.stat span {
-  display: block;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.stat strong {
-  display: block;
-  margin-top: 5px;
-  font-size: 14px;
-}
-
-.how {
-  margin-top: 12px;
-  padding: 13px;
-
-  border-left:
-    4px solid
-    var(--green);
-
-  background: var(--soft);
-  border-radius: 12px;
-}
-
-/* ================= DIAGNOSIS ================= */
-
-.diagnosis {
-  grid-column: 1 / -1;
-}
-
-.diagnosis-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.result {
-  margin-top: 14px;
-  padding: 15px;
-
-  border-radius: 14px;
-
-  background: var(--soft);
-
-  border:
-    1px solid
-    var(--border);
-}
-
-.result-title {
-  font-size: 19px;
-  font-weight: 800;
-  margin-bottom: 7px;
-}
-
-.badge {
-  display: inline-block;
-
-  padding: 5px 9px;
-
-  border-radius: 999px;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  margin-bottom: 8px;
-}
-
-.bad {
-  background: #ffe0e3;
-  color: #a31d2d;
-}
-
-.warn {
-  background: #fff0d7;
-  color: #915800;
-}
-
-.good {
-  background: #d9f7e3;
-  color: #087936;
-}
-
-.progress {
-  height: 7px;
-
-  margin-top: 10px;
-
-  background: var(--border);
-
-  border-radius: 20px;
-
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  width: 0;
-
-  background: var(--green);
-
-  transition: width .5s ease;
-}
-
-.advice {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
-  gap: 10px;
-
-  margin-top: 12px;
-}
-
-.advice-box {
-  padding: 12px;
-
-  border-radius: 12px;
-
-  background: var(--card);
-
-  border:
-    1px solid
-    var(--border);
-}
-
-.green-border {
-  border-left:
-    4px solid
-    var(--green);
-}
-
-.danger {
-  border-left:
-    4px solid
-    var(--danger);
-}
-
-/* ================= LANGUAGE ================= */
-
-.language-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.language-row .select {
-  margin: 0;
-  flex: 1;
-}
-
-.voice {
-  white-space: nowrap;
-}
-
-/* ================= FOOTER ================= */
-
-.footer {
-  padding: 20px;
-
-  text-align: center;
-
-  color: var(--muted);
-
-  font-size: 11px;
-
-  line-height: 1.7;
-}
-
-/* ================= MOBILE ================= */
-
-@media (max-width: 760px) {
-
-  .grid {
-    grid-template-columns: 1fr;
-    padding: 12px;
-  }
-
-  .diagnosis {
-    grid-column: auto;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .advice {
-    grid-template-columns: 1fr;
-  }
-
-  .brand {
-    font-size: 23px;
-  }
-
-  .hero {
-    border-radius:
-      0 0 22px 22px;
-  }
-
-}
-
-/* ================= SMALL PHONE ================= */
-
-@media (max-width: 390px) {
-
-  .actions {
-    grid-template-columns: 1fr;
-  }
-
-  .language-row {
-    flex-direction: column;
-  }
-
-  .voice {
-    width: 100%;
-  }
-
-}
-
-</style>
+<meta
+  name="description"
+  content="CropPilot AI field intelligence assistant"
+>
+
+<title>CropPilot — AI Field Intelligence</title>
+
+<link
+  rel="stylesheet"
+  href="styles.css"
+>
 
 </head>
 
+
 <body>
 
+
+<a
+  class="skip-link"
+  href="#main"
+>
+  Skip to main content
+</a>
+
+
 <div class="app">
-  <!-- ================= HEADER ================= -->
+
+
+<!-- =========================
+     HEADER
+========================= -->
 
 <header class="hero">
 
   <div class="top">
 
-    <div>
+    <a
+      href="index.html"
+      class="brand"
+      aria-label="CropPilot home"
+    >
 
-      <div class="brand">
-        🌱 <span data-i18n="brand">CropPilot</span>
-      </div>
+      <span aria-hidden="true">🌱</span> CropPilot
 
-      <div class="tagline">
-        <span data-i18n="tagline">
-          From Field Signals to the Right Action
-        </span>
-      </div>
+    </a>
 
-    </div>
 
     <button
       id="themeButton"
       class="theme-button"
-      type="button">
+      type="button"
+      aria-label="Switch to dark theme"
+    >
 
       🌙
 
@@ -577,220 +77,293 @@ button {
   </div>
 
 
-  <div class="weather-bar">
+  <div class="tagline">
 
-    <span id="weatherLocation">
-      📍 Detecting location...
-    </span>
+    From Field Signals to the Right Action
 
-    <strong id="weatherTemp">
-      🌤️ --°C
-    </strong>
+  </div>
+
+
+  <div class="hero-content">
+
+    <div>
+
+      <div class="eyebrow">
+        AI FIELD INTELLIGENCE
+      </div>
+
+
+      <h1>
+        Turn a crop photo into a clear next action.
+      </h1>
+
+
+      <p>
+
+        CropPilot combines crop imagery,
+        crop type and field conditions
+        to create a practical farmer advisory.
+
+      </p>
+
+
+      <div class="hero-actions">
+
+        <a
+          href="scan.html"
+          class="btn primary"
+        >
+
+          <span aria-hidden="true">🌿</span> Start Crop Scan
+
+        </a>
+
+
+        <a
+          href="history.html"
+          class="btn hero-secondary"
+        >
+
+          <span aria-hidden="true">🗂️</span> View History
+
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="hero-location">
+
+      <div class="location-title">
+
+        <span aria-hidden="true">📍</span>
+
+        <span id="weatherLocation">
+          Detecting location...
+        </span>
+
+      </div>
+
+
+      <div
+        id="weatherTemp"
+        class="hero-temperature"
+      >
+
+        🌤️ --°C
+
+      </div>
+
+
+      <div class="small">
+
+        Current field conditions
+
+      </div>
+
+    </div>
 
   </div>
 
 </header>
 
 
-<!-- ================= LOCATION ================= -->
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav
+  class="main-nav"
+  aria-label="Main navigation"
+>
+
+  <a
+    href="index.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">🏠</span> Dashboard
+  </a>
+
+  <a href="scan.html">
+    <span aria-hidden="true">📷</span> Scan
+  </a>
+
+  <a href="history.html">
+    <span aria-hidden="true">🗂️</span> History
+  </a>
+
+  <a href="field.html">
+    <span aria-hidden="true">📍</span> Field
+  </a>
+
+  <a href="guide.html">
+    <span aria-hidden="true">📘</span> Guide
+  </a>
+
+</nav>
+
+
+<!-- =========================
+     LIVE STATUS
+========================= -->
 
 <div
-  id="farmLocation"
-  class="location">
-
-  📍 Farm location:
-  Detecting...
-
+  id="liveStatus"
+  class="sr-only"
+  aria-live="polite"
+>
 </div>
 
 
-<!-- ================= MAIN ================= -->
+<!-- =========================
+     MAIN
+========================= -->
 
-<main class="grid">
+<main
+  id="main"
+  class="content"
+>
 
 
-<!-- ================= SCAN CROP ================= -->
+<!-- FIELD LOCATION -->
 
-<section class="card">
+<section class="location-card">
 
-  <h2 data-i18n="scanTitle">
-    Scan your crop
-  </h2>
+  <div>
 
-  <div
-    class="sub"
-    data-i18n="scanSub">
+    <strong>
+      <span aria-hidden="true">📍</span> Farm location
+    </strong>
 
-    Take a photo or select an existing
-    crop photo from your phone.
+    <div
+      id="farmLocation"
+      class="muted"
+    >
+
+      Detecting location...
+
+    </div>
 
   </div>
 
 
-  <div class="upload-box">
+  <div>
 
-    <div class="camera-icon">
-      📷
-    </div>
+    <strong>
+      <span aria-hidden="true">🌱</span> CropPilot
+    </strong>
 
+    <div class="muted">
 
-    <div
-      class="upload-title"
-      data-i18n="uploadTitle">
-
-      Take or upload a crop photo
+      Farmer-first AI
 
     </div>
-
-
-    <div
-      class="sub"
-      data-i18n="uploadSub">
-
-      Choose Camera or Gallery
-
-    </div>
-
-
-    <div class="actions">
-
-
-      <!-- CAMERA -->
-
-      <button
-        id="cameraButton"
-        class="btn"
-        type="button">
-
-        📷
-        <span data-i18n="camera">
-          Camera
-        </span>
-
-      </button>
-
-
-      <!-- GALLERY -->
-
-      <button
-        id="galleryButton"
-        class="btn"
-        type="button">
-
-        🖼️
-        <span data-i18n="gallery">
-          Gallery
-        </span>
-
-      </button>
-
-    </div>
-
-
-    <!-- CAMERA INPUT -->
-
-    <input
-      id="cameraInput"
-      class="file-input"
-      type="file"
-      accept="image/*"
-      capture="environment"
-    >
-
-
-    <!-- GALLERY INPUT -->
-
-    <input
-      id="galleryInput"
-      class="file-input"
-      type="file"
-      accept="image/*"
-    >
-
-
-    <!-- PREVIEW -->
-
-    <img
-      id="preview"
-      class="preview"
-      alt="Selected crop photo"
-    >
 
   </div>
-
-
-  <!-- CROP SELECT -->
-
-  <select
-    id="crop"
-    class="select">
-
-    <option value="Tomato">
-      🍅 Tomato
-    </option>
-
-    <option value="Potato">
-      🥔 Potato
-    </option>
-
-    <option value="Rice">
-      🌾 Rice
-    </option>
-
-    <option value="Chilli">
-      🌶️ Chilli
-    </option>
-
-    <option value="Cotton">
-      🌿 Cotton
-    </option>
-
-    <option value="Maize">
-      🌽 Maize
-    </option>
-
-    <option value="Groundnut">
-      🥜 Groundnut
-    </option>
-
-    <option value="Other">
-      🌱 Other
-    </option>
-
-  </select>
-
-
-  <!-- ANALYZE -->
-
-  <button
-    id="analyzeButton"
-    class="btn primary analyze"
-    type="button"
-    disabled>
-
-    🔍
-    <span data-i18n="analyze">
-      Analyze My Crop
-    </span>
-
-  </button>
 
 </section>
 
 
-<!-- ================= FIELD INTELLIGENCE ================= -->
+<!-- =========================
+     FEATURE CARDS
+========================= -->
+
+<section class="feature-grid">
+
+
+  <article class="feature-card">
+
+    <div class="feature-icon" aria-hidden="true">
+      📷
+    </div>
+
+    <h2>
+      Visual Triage
+    </h2>
+
+    <p>
+
+      Upload a crop image and
+      CropPilot checks whether
+      it is actually a plant image
+      before giving advice.
+
+    </p>
+
+  </article>
+
+
+  <article class="feature-card">
+
+    <div class="feature-icon" aria-hidden="true">
+      🌦️
+    </div>
+
+    <h2>
+      Field Context
+    </h2>
+
+    <p>
+
+      Temperature, humidity,
+      rain risk and wind can
+      provide useful supporting
+      field context.
+
+    </p>
+
+  </article>
+
+
+  <article class="feature-card">
+
+    <div class="feature-icon" aria-hidden="true">
+      🎯
+    </div>
+
+    <h2>
+      Actionable Advice
+    </h2>
+
+    <p>
+
+      Get a clear summary,
+      recommended action,
+      prevention and confidence.
+
+    </p>
+
+  </article>
+
+
+</section>
+
+
+<!-- =========================
+     FIELD INTELLIGENCE
+========================= -->
 
 <section class="card">
 
-  <h2 data-i18n="fieldTitle">
-    Field intelligence
-  </h2>
+  <div class="section-heading">
 
-  <div
-    class="sub"
-    data-i18n="fieldSub">
+    <div>
 
-    Current conditions around your farm
+      <div class="eyebrow">
+        LIVE CONDITIONS
+      </div>
+
+      <h2>
+        Field intelligence
+      </h2>
+
+      <p class="muted">
+        Current conditions around your farm.
+      </p>
+
+    </div>
 
   </div>
 
@@ -800,7 +373,7 @@ button {
 
     <div class="stat">
 
-      <span data-i18n="temperature">
+      <span>
         Temperature
       </span>
 
@@ -813,7 +386,7 @@ button {
 
     <div class="stat">
 
-      <span data-i18n="humidity">
+      <span>
         Humidity
       </span>
 
@@ -826,7 +399,7 @@ button {
 
     <div class="stat">
 
-      <span data-i18n="rain">
+      <span>
         Rain risk
       </span>
 
@@ -839,7 +412,7 @@ button {
 
     <div class="stat">
 
-      <span data-i18n="wind">
+      <span>
         Wind
       </span>
 
@@ -849,226 +422,232 @@ button {
 
     </div>
 
-  </div>
-
-
-  <div class="how">
-
-    🌱
-
-    <strong data-i18n="howTitle">
-      How CropPilot works
-    </strong>
-
-    <br>
-
-    <span
-      class="sub"
-      data-i18n="howText">
-
-      Crop image + crop type +
-      field conditions are combined
-      to generate an actionable
-      field advisory.
-
-    </span>
-
-  </div>
-
-</section>
-<!-- ================= FIELD DIAGNOSIS ================= -->
-
-<section class="card diagnosis">
-
-
-  <div class="diagnosis-header">
-
-    <div>
-
-      <h2 data-i18n="diagnosisTitle">
-        Field diagnosis
-      </h2>
-
-      <div
-        class="sub"
-        data-i18n="diagnosisSub">
-
-        AI-powered crop health analysis
-
-      </div>
-
-    </div>
-
-
-    <button
-      id="speakButton"
-      class="btn"
-      type="button">
-
-      🔊
-      <span data-i18n="speak">
-        Speak
-      </span>
-
-    </button>
-
-  </div>
-
-
-  <!-- RESULT -->
-
-  <div
-    id="result"
-    class="result">
-
-    <div
-      class="result-title"
-      id="resultTitle">
-
-      Waiting for crop image
-
-    </div>
-
-
-    <div
-      class="sub"
-      id="resultMessage">
-
-      Upload a crop photo
-      and select Analyze My Crop.
-
-    </div>
-
-
-    <div class="progress">
-
-      <div
-        id="progressBar"
-        class="progress-bar">
-      </div>
-
-    </div>
-
-
-    <div
-      class="sub"
-      style="margin-top:7px">
-
-      Confidence:
-
-      <span id="confidence">
-        --
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <!-- ADVICE -->
-
-  <div
-    id="advice"
-    class="advice"
-    style="display:none">
-
-    <div
-      id="actionBox"
-      class="advice-box green-border">
-
-      <strong data-i18n="action">
-        Recommended action
-      </strong>
-
-      <br><br>
-
-      <span id="actionText"></span>
-
-    </div>
-
-
-    <div
-      id="preventionBox"
-      class="advice-box">
-
-      <strong data-i18n="prevention">
-        Prevention
-      </strong>
-
-      <br><br>
-
-      <span id="preventionText"></span>
-
-    </div>
 
   </div>
 
 </section>
 
 
-<!-- ================= FARMER LANGUAGE ================= -->
+<!-- =========================
+     HOW IT WORKS
+========================= -->
 
 <section class="card">
 
-  <h2>
-    🌐
-    <span data-i18n="languageTitle">
-      Farmer language
-    </span>
-  </h2>
+  <div class="section-heading">
 
+    <div>
 
-  <div
-    class="sub"
-    data-i18n="languageSub">
+      <div class="eyebrow">
+        SIMPLE WORKFLOW
+      </div>
 
-    Choose the language for
-    the advisory and voice.
+      <h2>
+        How CropPilot works
+      </h2>
+
+    </div>
 
   </div>
 
 
-  <div class="language-row">
+  <div class="steps">
 
 
-    <select
-      id="language"
-      class="select">
+    <div class="step">
 
-      <option value="English">
-        English
-      </option>
+      <div class="step-number">
+        01
+      </div>
 
-      <option value="Telugu">
-        తెలుగు (Telugu)
-      </option>
+      <div>
 
-      <option value="Hindi">
-        हिन्दी (Hindi)
-      </option>
+        <strong>
+          Capture
+        </strong>
 
-      <option value="Tamil">
-        தமிழ் (Tamil)
-      </option>
+        <p class="muted">
+          Take or upload a clear crop photo.
+        </p>
 
-      <option value="Kannada">
-        ಕನ್ನಡ (Kannada)
-      </option>
+      </div>
 
-    </select>
+    </div>
 
 
-    <button
-      id="voiceButton"
-      class="btn primary voice"
-      type="button">
+    <div class="step">
 
-      🔊
-      <span data-i18n="voice">
-        Voice
+      <div class="step-number">
+        02
+      </div>
+
+      <div>
+
+        <strong>
+          Validate
+        </strong>
+
+        <p class="muted">
+          AI checks whether the image is relevant.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        03
+      </div>
+
+      <div>
+
+        <strong>
+          Analyze
+        </strong>
+
+        <p class="muted">
+          Image and field signals are combined.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        04
+      </div>
+
+      <div>
+
+        <strong>
+          Act
+        </strong>
+
+        <p class="muted">
+          Receive a practical advisory.
+        </p>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     QUICK ACTIONS
+========================= -->
+
+<section class="card">
+
+  <div class="section-heading">
+
+    <div>
+
+      <div class="eyebrow">
+        QUICK ACTIONS
+      </div>
+
+      <h2>
+        What would you like to do?
+      </h2>
+
+    </div>
+
+  </div>
+
+
+  <div class="quick-grid">
+
+
+    <a
+      href="scan.html"
+      class="quick-card"
+    >
+
+      <span aria-hidden="true">
+        📷
       </span>
 
-    </button>
+      <strong>
+        New crop scan
+      </strong>
+
+      <small>
+        Analyze a fresh photo
+      </small>
+
+    </a>
+
+
+    <a
+      href="history.html"
+      class="quick-card"
+    >
+
+      <span aria-hidden="true">
+        🗂️
+      </span>
+
+      <strong>
+        Past analyses
+      </strong>
+
+      <small>
+        Review previous results
+      </small>
+
+    </a>
+
+
+    <a
+      href="field.html"
+      class="quick-card"
+    >
+
+      <span aria-hidden="true">
+        🌦️
+      </span>
+
+      <strong>
+        Field conditions
+      </strong>
+
+      <small>
+        Check local conditions
+      </small>
+
+    </a>
+
+
+    <a
+      href="guide.html"
+      class="quick-card"
+    >
+
+      <span aria-hidden="true">
+        📘
+      </span>
+
+      <strong>
+        Farmer guide
+      </strong>
+
+      <small>
+        Learn the workflow
+      </small>
+
+    </a>
+
 
   </div>
 
@@ -1078,1826 +657,72 @@ button {
 </main>
 
 
-<!-- ================= FOOTER ================= -->
+<!-- =========================
+     FOOTER
+========================= -->
 
 <footer class="footer">
 
-  <span id="footerText">
+  <strong>
+    <span aria-hidden="true">🌱</span> CropPilot AI
+  </strong>
 
-    CropPilot AI • Field intelligence
-    for better decisions
+  <p>
+    Field intelligence for better decisions.
+  </p>
 
-  </span>
-
-  <br><br>
-
-  <span id="footerWarning">
-
-    AI advice should be verified
-    with local agricultural guidance.
-
-  </span>
+  <p>
+    AI advice should be verified with
+    local agricultural guidance.
+  </p>
 
 </footer>
+
+
+<!-- MOBILE NAV -->
+
+<nav
+  class="mobile-nav"
+  aria-label="Mobile navigation"
+>
+
+  <a
+    href="index.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">🏠</span>
+    <span>Home</span>
+  </a>
+
+  <a href="scan.html">
+
+    <span aria-hidden="true">📷</span>
+    <span>Scan</span>
+
+  </a>
+
+  <a href="history.html">
+
+    <span aria-hidden="true">🗂️</span>
+    <span>History</span>
+
+  </a>
+
+  <a href="field.html">
+
+    <span aria-hidden="true">📍</span>
+    <span>Field</span>
+
+  </a>
+
+</nav>
 
 
 </div>
 
 
-<script>
-  /* =====================================================
-   CROP PILOT JAVASCRIPT
-===================================================== */
-
-let selectedFile = null;
-let currentResult = null;
-let isSpeaking = false;
-let previewURL = null;
-
-
-/* ================= ELEMENTS ================= */
-
-const themeButton =
-  document.getElementById("themeButton");
-
-const cameraButton =
-  document.getElementById("cameraButton");
-
-const galleryButton =
-  document.getElementById("galleryButton");
-
-const cameraInput =
-  document.getElementById("cameraInput");
-
-const galleryInput =
-  document.getElementById("galleryInput");
-
-const preview =
-  document.getElementById("preview");
-
-const analyzeButton =
-  document.getElementById("analyzeButton");
-
-const languageSelect =
-  document.getElementById("language");
-
-const voiceButton =
-  document.getElementById("voiceButton");
-
-const speakButton =
-  document.getElementById("speakButton");
-
-
-/* =====================================================
-   THEME
-===================================================== */
-
-function applyTheme(theme) {
-
-  if (theme === "dark") {
-
-    document.body.classList.add("dark");
-
-    themeButton.textContent = "☀️";
-
-  } else {
-
-    document.body.classList.remove("dark");
-
-    themeButton.textContent = "🌙";
-
-  }
-
-}
-
-const savedTheme =
-  localStorage.getItem("cropPilotTheme");
-
-applyTheme(
-  savedTheme === "dark"
-    ? "dark"
-    : "light"
-);
-
-
-themeButton.addEventListener(
-  "click",
-  function () {
-
-    const isDark =
-      document.body.classList.contains("dark");
-
-    const newTheme =
-      isDark ? "light" : "dark";
-
-    applyTheme(newTheme);
-
-    localStorage.setItem(
-      "cropPilotTheme",
-      newTheme
-    );
-
-  }
-);
-
-
-/* =====================================================
-   CAMERA
-===================================================== */
-
-cameraButton.addEventListener(
-  "click",
-  function () {
-
-    cameraInput.value = "";
-
-    cameraInput.click();
-
-  }
-);
-
-
-/* =====================================================
-   GALLERY
-===================================================== */
-
-galleryButton.addEventListener(
-  "click",
-  function () {
-
-    galleryInput.value = "";
-
-    galleryInput.click();
-
-  }
-);
-
-
-/* =====================================================
-   FILE SELECTION
-===================================================== */
-
-cameraInput.addEventListener(
-  "change",
-  function (event) {
-
-    const file =
-      event.target.files &&
-      event.target.files[0];
-
-    handlePhoto(file);
-
-  }
-);
-
-
-galleryInput.addEventListener(
-  "change",
-  function (event) {
-
-    const file =
-      event.target.files &&
-      event.target.files[0];
-
-    handlePhoto(file);
-
-  }
-);
-
-
-/* =====================================================
-   HANDLE PHOTO
-===================================================== */
-
-function handlePhoto(file) {
-
-  if (!file) {
-    return;
-  }
-
-  if (
-    !file.type ||
-    !file.type.startsWith("image/")
-  ) {
-
-    alert(
-      "Please select a valid image."
-    );
-
-    return;
-  }
-
-
-  selectedFile = file;
-
-
-  if (previewURL) {
-
-    URL.revokeObjectURL(
-      previewURL
-    );
-
-  }
-
-
-  previewURL =
-    URL.createObjectURL(file);
-
-
-  preview.src =
-    previewURL;
-
-
-  preview.style.display =
-    "block";
-
-
-  analyzeButton.disabled =
-    false;
-
-
-  currentResult =
-    null;
-
-
-  document.getElementById(
-    "resultTitle"
-  ).textContent =
-    "Photo selected";
-
-
-  document.getElementById(
-    "resultMessage"
-  ).textContent =
-    file.name;
-
-
-  document.getElementById(
-    "confidence"
-  ).textContent =
-    "--";
-
-
-  document.getElementById(
-    "progressBar"
-  ).style.width =
-    "0";
-
-
-  document.getElementById(
-    "advice"
-  ).style.display =
-    "none";
-
-}
-
-
-/* =====================================================
-   TRANSLATIONS
-===================================================== */
-
-const translations = {
-
-  English: {
-
-    brand: "CropPilot",
-    tagline: "From Field Signals to the Right Action",
-
-    scanTitle: "Scan your crop",
-
-    scanSub:
-      "Take a photo or select an existing crop photo from your phone.",
-
-    uploadTitle:
-      "Take or upload a crop photo",
-
-    uploadSub:
-      "Choose Camera or Gallery",
-
-    camera: "Camera",
-    gallery: "Gallery",
-
-    analyze:
-      "Analyze My Crop",
-
-    fieldTitle:
-      "Field intelligence",
-
-    fieldSub:
-      "Current conditions around your farm",
-
-    temperature:
-      "Temperature",
-
-    humidity:
-      "Humidity",
-
-    rain:
-      "Rain risk",
-
-    wind:
-      "Wind",
-
-    howTitle:
-      "How CropPilot works",
-
-    howText:
-      "Crop image + crop type + field conditions are combined to generate an actionable field advisory.",
-
-    diagnosisTitle:
-      "Field diagnosis",
-
-    diagnosisSub:
-      "AI-powered crop health analysis",
-
-    speak:
-      "Speak",
-
-    languageTitle:
-      "Farmer language",
-
-    languageSub:
-      "Choose the language for the advisory and voice.",
-
-    voice:
-      "Voice",
-
-    action:
-      "Recommended action",
-
-    prevention:
-      "Prevention",
-
-    footer:
-      "CropPilot AI • Field intelligence for better decisions",
-
-    warning:
-      "AI advice should be verified with local agricultural guidance."
-
-  },
-
-
-  Telugu: {
-
-    brand:
-      "క్రాప్ పైలట్",
-
-    tagline:
-      "పంట సమాచారం నుండి సరైన చర్య వరకు",
-
-    scanTitle:
-      "మీ పంటను స్కాన్ చేయండి",
-
-    scanSub:
-      "ఫోటో తీయండి లేదా మీ ఫోన్‌లో ఉన్న పంట ఫోటోను ఎంచుకోండి.",
-
-    uploadTitle:
-      "పంట ఫోటో తీయండి లేదా అప్‌లోడ్ చేయండి",
-
-    uploadSub:
-      "కెమెరా లేదా గ్యాలరీని ఎంచుకోండి",
-
-    camera:
-      "కెమెరా",
-
-    gallery:
-      "గ్యాలరీ",
-
-    analyze:
-      "నా పంటను విశ్లేషించండి",
-
-    fieldTitle:
-      "పొలం సమాచారం",
-
-    fieldSub:
-      "మీ పొలం ప్రస్తుత పరిస్థితులు",
-
-    temperature:
-      "ఉష్ణోగ్రత",
-
-    humidity:
-      "తేమ",
-
-    rain:
-      "వర్షం ప్రమాదం",
-
-    wind:
-      "గాలి",
-
-    howTitle:
-      "CropPilot ఎలా పనిచేస్తుంది",
-
-    howText:
-      "పంట ఫోటో, పంట రకం మరియు పొలం పరిస్థితులను కలిపి ఉపయోగకరమైన సలహా రూపొందిస్తుంది.",
-
-    diagnosisTitle:
-      "పంట నిర్ధారణ",
-
-    diagnosisSub:
-      "AI ఆధారిత పంట ఆరోగ్య విశ్లేషణ",
-
-    speak:
-      "వినండి",
-
-    languageTitle:
-      "రైతు భాష",
-
-    languageSub:
-      "సలహా మరియు వాయిస్ కోసం భాషను ఎంచుకోండి.",
-
-    voice:
-      "వాయిస్",
-
-    action:
-      "సిఫార్సు చేసిన చర్య",
-
-    prevention:
-      "నివారణ",
-
-    footer:
-      "CropPilot AI • మెరుగైన వ్యవసాయ నిర్ణయాల కోసం",
-
-    warning:
-      "AI సలహాను స్థానిక వ్యవసాయ నిపుణుల సలహాతో ధృవీకరించండి."
-
-  },
-
-
-  Hindi: {
-
-    brand:
-      "क्रॉप पायलट",
-
-    tagline:
-      "खेत की जानकारी से सही कार्रवाई तक",
-
-    scanTitle:
-      "अपनी फसल स्कैन करें",
-
-    scanSub:
-      "फोटो लें या अपने फोन से फसल की फोटो चुनें।",
-
-    uploadTitle:
-      "फसल की फोटो लें या अपलोड करें",
-
-    uploadSub:
-      "कैमरा या गैलरी चुनें",
-
-    camera:
-      "कैमरा",
-
-    gallery:
-      "गैलरी",
-
-    analyze:
-      "मेरी फसल का विश्लेषण करें",
-
-    fieldTitle:
-      "खेत की जानकारी",
-
-    fieldSub:
-      "आपके खेत की वर्तमान स्थिति",
-
-    temperature:
-      "तापमान",
-
-    humidity:
-      "नमी",
-
-    rain:
-      "बारिश का खतरा",
-
-    wind:
-      "हवा",
-
-    howTitle:
-      "CropPilot कैसे काम करता है",
-
-    howText:
-      "फसल की फोटो, फसल का प्रकार और खेत की परिस्थितियों को मिलाकर सलाह तैयार की जाती है।",
-
-    diagnosisTitle:
-      "फसल निदान",
-
-    diagnosisSub:
-      "AI आधारित फसल स्वास्थ्य विश्लेषण",
-
-    speak:
-      "सुनें",
-
-    languageTitle:
-      "किसान की भाषा",
-
-    languageSub:
-      "सलाह और आवाज के लिए भाषा चुनें।",
-
-    voice:
-      "आवाज",
-
-    action:
-      "अनुशंसित कार्रवाई",
-
-    prevention:
-      "रोकथाम",
-
-    footer:
-      "CropPilot AI • बेहतर कृषि निर्णयों के लिए",
-
-    warning:
-      "AI सलाह को स्थानीय कृषि विशेषज्ञ की सलाह से सत्यापित करें।"
-
-  },
-
-
-  Tamil: {
-
-    brand:
-      "கிராப் பைலட்",
-
-    tagline:
-      "வயல் தகவலிலிருந்து சரியான நடவடிக்கை வரை",
-
-    scanTitle:
-      "உங்கள் பயிரை ஸ்கேன் செய்யுங்கள்",
-
-    scanSub:
-      "புகைப்படம் எடுக்கவும் அல்லது உங்கள் தொலைபேசியில் உள்ள பயிர் புகைப்படத்தைத் தேர்ந்தெடுக்கவும்.",
-
-    uploadTitle:
-      "பயிர் புகைப்படத்தை எடுக்கவும் அல்லது பதிவேற்றவும்",
-
-    uploadSub:
-      "கேமரா அல்லது கேலரியைத் தேர்ந்தெடுக்கவும்",
-
-    camera:
-      "கேமரா",
-
-    gallery:
-      "கேலரி",
-
-    analyze:
-      "என் பயிரை ஆய்வு செய்",
-
-    fieldTitle:
-      "வயல் தகவல்",
-
-    fieldSub:
-      "உங்கள் வயலின் தற்போதைய நிலை",
-
-    temperature:
-      "வெப்பநிலை",
-
-    humidity:
-      "ஈரப்பதம்",
-
-    rain:
-      "மழை அபாயம்",
-
-    wind:
-      "காற்று",
-
-    howTitle:
-      "CropPilot எப்படி செயல்படுகிறது",
-
-    howText:
-      "பயிர் புகைப்படம், பயிர் வகை மற்றும் வயல் நிலை ஆகியவற்றை இணைத்து ஆலோசனை உருவாக்குகிறது.",
-
-    diagnosisTitle:
-      "பயிர் கண்டறிதல்",
-
-    diagnosisSub:
-      "AI அடிப்படையிலான பயிர் ஆரோக்கிய ஆய்வு",
-
-    speak:
-      "கேளுங்கள்",
-
-    languageTitle:
-      "விவசாயி மொழி",
-
-    languageSub:
-      "ஆலோசனை மற்றும் குரலுக்கான மொழியைத் தேர்ந்தெடுக்கவும்.",
-
-    voice:
-      "குரல்",
-
-    action:
-      "பரிந்துரைக்கப்பட்ட நடவடிக்கை",
-
-    prevention:
-      "தடுப்பு",
-
-    footer:
-      "CropPilot AI • சிறந்த விவசாய முடிவுகளுக்காக",
-
-    warning:
-      "AI ஆலோசனையை உள்ளூர் விவசாய நிபுணரின் ஆலோசனையுடன் சரிபார்க்கவும்."
-
-  },
-
-
-  Kannada: {
-
-    brand:
-      "ಕ್ರಾಪ್ ಪೈಲಟ್",
-
-    tagline:
-      "ಹೊಲದ ಮಾಹಿತಿಯಿಂದ ಸರಿಯಾದ ಕ್ರಮದವರೆಗೆ",
-
-    scanTitle:
-      "ನಿಮ್ಮ ಬೆಳೆಯನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
-
-    scanSub:
-      "ಫೋಟೋ ತೆಗೆದುಕೊಳ್ಳಿ ಅಥವಾ ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿರುವ ಬೆಳೆಯ ಫೋಟೋ ಆಯ್ಕೆಮಾಡಿ.",
-
-    uploadTitle:
-      "ಬೆಳೆಯ ಫೋಟೋ ತೆಗೆದುಕೊಳ್ಳಿ ಅಥವಾ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
-
-    uploadSub:
-      "ಕ್ಯಾಮೆರಾ ಅಥವಾ ಗ್ಯಾಲರಿ ಆಯ್ಕೆಮಾಡಿ",
-
-    camera:
-      "ಕ್ಯಾಮೆರಾ",
-
-    gallery:
-      "ಗ್ಯಾಲರಿ",
-
-    analyze:
-      "ನನ್ನ ಬೆಳೆಯನ್ನು ವಿಶ್ಲೇಷಿಸಿ",
-
-    fieldTitle:
-      "ಹೊಲದ ಮಾಹಿತಿ",
-
-    fieldSub:
-      "ನಿಮ್ಮ ಹೊಲದ ಪ್ರಸ್ತುತ ಪರಿಸ್ಥಿತಿಗಳು",
-
-    temperature:
-      "ತಾಪಮಾನ",
-
-    humidity:
-      "ತೇವಾಂಶ",
-
-    rain:
-      "ಮಳೆಯ ಅಪಾಯ",
-
-    wind:
-      "ಗಾಳಿ",
-
-    howTitle:
-      "CropPilot ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ",
-
-    howText:
-      "ಬೆಳೆಯ ಫೋಟೋ, ಬೆಳೆಯ ಪ್ರಕಾರ ಮತ್ತು ಹೊಲದ ಪರಿಸ್ಥಿತಿಗಳನ್ನು ಸೇರಿಸಿ ಸಲಹೆ ನೀಡುತ್ತದೆ.",
-
-    diagnosisTitle:
-      "ಬೆಳೆ ರೋಗನಿರ್ಣಯ",
-
-    diagnosisSub:
-      "AI ಆಧಾರಿತ ಬೆಳೆ ಆರೋಗ್ಯ ವಿಶ್ಲೇಷಣೆ",
-
-    speak:
-      "ಕೇಳಿ",
-
-    languageTitle:
-      "ರೈತರ ಭಾಷೆ",
-
-    languageSub:
-      "ಸಲಹೆ ಮತ್ತು ಧ್ವನಿಗಾಗಿ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
-
-    voice:
-      "ಧ್ವನಿ",
-
-    action:
-      "ಶಿಫಾರಸು ಮಾಡಿದ ಕ್ರಮ",
-
-    prevention:
-      "ತಡೆಗಟ್ಟುವಿಕೆ",
-
-    footer:
-      "CropPilot AI • ಉತ್ತಮ ಕೃಷಿ ನಿರ್ಧಾರಗಳಿಗಾಗಿ",
-
-    warning:
-      "AI ಸಲಹೆಯನ್ನು ಸ್ಥಳೀಯ ಕೃಷಿ ತಜ್ಞರ ಸಲಹೆಯೊಂದಿಗೆ ಪರಿಶೀಲಿಸಿ."
-
-  }
-
-};
-
-
-/* =====================================================
-   APPLY LANGUAGE
-===================================================== */
-
-function applyLanguage(language) {
-
-  if (!translations[language]) {
-    language = "English";
-  }
-
-
-  const t =
-    translations[language];
-
-
-  document
-    .querySelectorAll("[data-i18n]")
-    .forEach(function(element) {
-
-      const key =
-        element.getAttribute("data-i18n");
-
-      if (t[key]) {
-        element.textContent =
-          t[key];
-      }
-
-    });
-
-
-  document.getElementById(
-    "footerText"
-  ).textContent =
-    t.footer;
-
-
-  document.getElementById(
-    "footerWarning"
-  ).textContent =
-    t.warning;
-
-
-  localStorage.setItem(
-    "cropPilotLanguage",
-    language
-  );
-
-}
-
-
-const savedLanguage =
-  localStorage.getItem(
-    "cropPilotLanguage"
-  );
-
-
-if (
-  savedLanguage &&
-  translations[savedLanguage]
-) {
-
-  languageSelect.value =
-    savedLanguage;
-
-}
-
-
-applyLanguage(
-  languageSelect.value ||
-  "English"
-);
-
-
-languageSelect.addEventListener(
-  "change",
-  function() {
-
-    if (
-      "speechSynthesis" in window
-    ) {
-
-      speechSynthesis.cancel();
-
-    }
-
-    isSpeaking = false;
-
-    applyLanguage(
-      languageSelect.value
-    );
-
-  }
-);
-  /* =====================================================
-   LOCATION + WEATHER
-===================================================== */
-
-let field = {
-  place: "Unknown",
-  temperature: null,
-  humidity: null,
-  rain: null,
-  wind: null
-};
-
-
-function getLocation() {
-
-  if (!navigator.geolocation) {
-
-    document.getElementById(
-      "farmLocation"
-    ).textContent =
-      "📍 Location unavailable";
-
-    return;
-
-  }
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    async function(position) {
-
-      const lat =
-        position.coords.latitude;
-
-      const lon =
-        position.coords.longitude;
-
-
-      await getWeather(
-        lat,
-        lon
-      );
-
-
-      await reverseLocation(
-        lat,
-        lon
-      );
-
-    },
-
-
-    function() {
-
-      document.getElementById(
-        "farmLocation"
-      ).textContent =
-        "📍 Location permission not granted";
-
-    },
-
-
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 300000
-    }
-
-  );
-
-}
-
-
-async function getWeather(
-  lat,
-  lon
-) {
-
-  try {
-
-    const url =
-      "https://api.open-meteo.com/v1/forecast" +
-      "?latitude=" + lat +
-      "&longitude=" + lon +
-      "&current=temperature_2m,relative_humidity_2m,wind_speed_10m" +
-      "&hourly=precipitation_probability" +
-      "&forecast_days=1" +
-      "&timezone=auto";
-
-
-    const response =
-      await fetch(url);
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Weather request failed"
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    const current =
-      data.current;
-
-
-    field.temperature =
-      Math.round(
-        current.temperature_2m
-      );
-
-
-    field.humidity =
-      Math.round(
-        current.relative_humidity_2m
-      );
-
-
-    field.wind =
-      Math.round(
-        current.wind_speed_10m
-      );
-
-
-    const rainValues =
-      data.hourly
-        .precipitation_probability
-        .slice(0, 12);
-
-
-    field.rain =
-      Math.max(
-        ...rainValues
-      );
-
-
-    document.getElementById(
-      "temperature"
-    ).textContent =
-      field.temperature + "°C";
-
-
-    document.getElementById(
-      "humidity"
-    ).textContent =
-      field.humidity + "%";
-
-
-    document.getElementById(
-      "rain"
-    ).textContent =
-      field.rain + "%";
-
-
-    document.getElementById(
-      "wind"
-    ).textContent =
-      field.wind + " km/h";
-
-
-    document.getElementById(
-      "weatherTemp"
-    ).textContent =
-      "🌤️ " +
-      field.temperature +
-      "°C";
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "Weather error:",
-      error
-    );
-
-  }
-
-}
-
-
-async function reverseLocation(
-  lat,
-  lon
-) {
-
-  try {
-
-    /*
-      Use a public reverse geocoding
-      service for the visible location.
-    */
-
-    const url =
-      "https://nominatim.openstreetmap.org/reverse" +
-      "?format=json" +
-      "&lat=" + lat +
-      "&lon=" + lon +
-      "&zoom=10" +
-      "&addressdetails=1";
-
-
-    const response =
-      await fetch(
-        url,
-        {
-          headers: {
-            "Accept":
-              "application/json"
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-      throw new Error(
-        "Location lookup failed"
-      );
-    }
-
-
-    const data =
-      await response.json();
-
-
-    const address =
-      data.address || {};
-
-
-    const place =
-      address.city ||
-      address.town ||
-      address.village ||
-      address.county ||
-      "Your location";
-
-
-    const state =
-      address.state ||
-      "";
-
-
-    field.place =
-      state
-        ? place + ", " + state
-        : place;
-
-
-    document.getElementById(
-      "weatherLocation"
-    ).textContent =
-      "📍 " +
-      field.place;
-
-
-    document.getElementById(
-      "farmLocation"
-    ).textContent =
-      "📍 Farm location: " +
-      field.place;
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "Reverse location error:",
-      error
-    );
-
-
-    field.place =
-      lat.toFixed(3) +
-      ", " +
-      lon.toFixed(3);
-
-
-    document.getElementById(
-      "weatherLocation"
-    ).textContent =
-      "📍 " +
-      field.place;
-
-
-    document.getElementById(
-      "farmLocation"
-    ).textContent =
-      "📍 Farm location: " +
-      field.place;
-
-  }
-
-}
-
-
-getLocation();
-
-
-/* =====================================================
-   ANALYZE CROP
-===================================================== */
-
-analyzeButton.addEventListener(
-  "click",
-  analyzeCrop
-);
-
-
-async function analyzeCrop() {
-
-  if (!selectedFile) {
-
-    alert(
-      "Please select a crop photo first."
-    );
-
-    return;
-
-  }
-
-
-  const crop =
-    document.getElementById(
-      "crop"
-    ).value;
-
-
-  analyzeButton.disabled =
-    true;
-
-
-  analyzeButton.innerHTML =
-    "⏳ Analyzing...";
-
-
-  document.getElementById(
-    "resultTitle"
-  ).textContent =
-    "Analyzing crop...";
-
-
-  document.getElementById(
-    "resultMessage"
-  ).textContent =
-    "Please wait while CropPilot analyzes your photo.";
-
-
-  document.getElementById(
-    "progressBar"
-  ).style.width =
-    "35%";
-
-
-  try {
-
-    const base64 =
-      await fileToBase64(
-        selectedFile
-      );
-
-
-    const payload = {
-
-      image:
-        base64,
-
-      mimeType:
-        selectedFile.type,
-
-      crop:
-        crop,
-
-      language:
-        languageSelect.value,
-
-      location:
-        field.place,
-
-      weather: {
-
-        temperature:
-          field.temperature,
-
-        humidity:
-          field.humidity,
-
-        rain:
-          field.rain,
-
-        wind:
-          field.wind
-
-      }
-
-    };
-
-
-    const response =
-      await fetch(
-        "/api/analyze",
-        {
-
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify(payload)
-
-        }
-      );
-
-
-    const contentType =
-      response.headers
-        .get("content-type") || "";
-
-
-    if (
-      !contentType.includes(
-        "application/json"
-      )
-    ) {
-
-      const text =
-        await response.text();
-
-
-      console.error(
-        "Server returned:",
-        text
-      );
-
-
-      throw new Error(
-        "AI API returned HTML instead of JSON. Make sure /api/analyze exists and is deployed."
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        data.error ||
-        "AI analysis failed."
-      );
-
-    }
-
-
-    currentResult =
-      data;
-
-
-    document.getElementById(
-      "progressBar"
-    ).style.width =
-      "100%";
-
-
-    showDiagnosis(
-      data
-    );
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "Analysis error:",
-      error
-    );
-
-
-    document.getElementById(
-      "resultTitle"
-    ).textContent =
-      "⚠️ AI analysis failed";
-
-
-    document.getElementById(
-      "resultMessage"
-    ).textContent =
-      error.message;
-
-
-    document.getElementById(
-      "confidence"
-    ).textContent =
-      "--";
-
-
-    document.getElementById(
-      "progressBar"
-    ).style.width =
-      "0";
-
-  }
-
-
-  finally {
-
-    analyzeButton.disabled =
-      false;
-
-
-    analyzeButton.innerHTML =
-      "🔍 <span data-i18n=\"analyze\">Analyze My Crop</span>";
-
-
-    applyLanguage(
-      languageSelect.value
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   FILE TO BASE64
-===================================================== */
-
-function fileToBase64(file) {
-
-  return new Promise(
-    function(resolve, reject) {
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function() {
-
-          const result =
-            reader.result;
-
-
-          const base64 =
-            result.split(",")[1];
-
-
-          if (!base64) {
-
-            reject(
-              new Error(
-                "Could not convert image."
-              )
-            );
-
-            return;
-
-          }
-
-
-          resolve(
-            base64
-          );
-
-        };
-
-
-      reader.onerror =
-        function() {
-
-          reject(
-            new Error(
-              "Could not read the image."
-            )
-          );
-
-        };
-
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   SHOW DIAGNOSIS
-===================================================== */
-
-function showDiagnosis(data) {
-
-  const health =
-    data.cropHealth ||
-    data.health ||
-    data.status ||
-    "Analysis complete";
-
-
-  const diagnosis =
-    data.diagnosis ||
-    data.problem ||
-    data.disease ||
-    "No specific diagnosis returned.";
-
-
-  const symptoms =
-    data.symptoms ||
-    "";
-
-
-  const action =
-    data.immediateAction ||
-    data.action ||
-    data.treatment ||
-    "Follow local agricultural guidance.";
-
-
-  const prevention =
-    data.prevention ||
-    data.preventiveMeasures ||
-    "Continue regular crop monitoring.";
-
-
-  let confidence =
-    data.confidence;
-
-
-  if (
-    typeof confidence === "string"
-  ) {
-
-    confidence =
-      confidence.replace(
-        "%",
-        ""
-      );
-
-  }
-
-
-  confidence =
-    Number(confidence);
-
-
-  if (
-    !Number.isFinite(confidence)
-  ) {
-
-    confidence =
-      0;
-
-  }
-
-
-  confidence =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        confidence
-      )
-    );
-
-
-  document.getElementById(
-    "resultTitle"
-  ).textContent =
-    health;
-
-
-  document.getElementById(
-    "resultMessage"
-  ).innerHTML =
-    "<strong>" +
-    escapeHTML(diagnosis) +
-    "</strong>" +
-    (
-      symptoms
-        ? "<br><br>" +
-          escapeHTML(symptoms)
-        : ""
-    );
-
-
-  document.getElementById(
-    "confidence"
-  ).textContent =
-    confidence +
-    "%";
-
-
-  document.getElementById(
-    "progressBar"
-  ).style.width =
-    confidence +
-    "%";
-
-
-  document.getElementById(
-    "actionText"
-  ).textContent =
-    action;
-
-
-  document.getElementById(
-    "preventionText"
-  ).textContent =
-    prevention;
-
-
-  document.getElementById(
-    "advice"
-  ).style.display =
-    "grid";
-
-
-  currentResult =
-    data;
-
-}
-
-
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
-
-function escapeHTML(value) {
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-/* =====================================================
-   VOICE
-===================================================== */
-
-const speechLanguages = {
-
-  English:
-    "en-IN",
-
-  Telugu:
-    "te-IN",
-
-  Hindi:
-    "hi-IN",
-
-  Tamil:
-    "ta-IN",
-
-  Kannada:
-    "kn-IN"
-
-};
-
-
-function getSpeechText() {
-
-  if (!currentResult) {
-    return "";
-  }
-
-
-  const health =
-    currentResult.cropHealth ||
-    currentResult.health ||
-    currentResult.status ||
-    "";
-
-
-  const diagnosis =
-    currentResult.diagnosis ||
-    currentResult.problem ||
-    currentResult.disease ||
-    "";
-
-
-  const symptoms =
-    currentResult.symptoms ||
-    "";
-
-
-  const action =
-    currentResult.immediateAction ||
-    currentResult.action ||
-    currentResult.treatment ||
-    "";
-
-
-  const prevention =
-    currentResult.prevention ||
-    currentResult.preventiveMeasures ||
-    "";
-
-
-  return [
-
-    health,
-    diagnosis,
-    symptoms,
-    action,
-    prevention
-
-  ]
-    .filter(Boolean)
-    .join(". ");
-
-}
-
-
-function speakResult(button) {
-
-  if (
-    !("speechSynthesis" in window)
-  ) {
-
-    alert(
-      "Voice is not supported by this browser."
-    );
-
-    return;
-
-  }
-
-
-  if (isSpeaking) {
-
-    speechSynthesis.cancel();
-
-    isSpeaking =
-      false;
-
-    applyLanguage(
-      languageSelect.value
-    );
-
-    return;
-
-  }
-
-
-  if (!currentResult) {
-
-    alert(
-      "Analyze a crop first."
-    );
-
-    return;
-
-  }
-
-
-  const text =
-    getSpeechText();
-
-
-  if (!text) {
-
-    alert(
-      "No diagnosis is available to speak."
-    );
-
-    return;
-
-  }
-
-
-  const language =
-    languageSelect.value;
-
-
-  const utterance =
-    new SpeechSynthesisUtterance(
-      text
-    );
-
-
-  utterance.lang =
-    speechLanguages[language] ||
-    "en-IN";
-
-
-  utterance.rate =
-    0.82;
-
-
-  utterance.pitch =
-    1;
-
-
-  utterance.volume =
-    1;
-
-
-  utterance.onstart =
-    function() {
-
-      isSpeaking =
-        true;
-
-      button.innerHTML =
-        "⏹️ Stop";
-
-    };
-
-
-  utterance.onend =
-    function() {
-
-      isSpeaking =
-        false;
-
-      applyLanguage(
-        language
-      );
-
-    };
-
-
-  utterance.onerror =
-    function(error) {
-
-      console.error(
-        "Speech error:",
-        error
-      );
-
-      isSpeaking =
-        false;
-
-      applyLanguage(
-        language
-      );
-
-    };
-
-
-  speechSynthesis.cancel();
-
-  speechSynthesis.speak(
-    utterance
-  );
-
-}
-
-
-/* =====================================================
-   VOICE BUTTONS
-===================================================== */
-
-voiceButton.addEventListener(
-  "click",
-  function() {
-
-    speakResult(
-      voiceButton
-    );
-
-  }
-);
-
-
-speakButton.addEventListener(
-  "click",
-  function() {
-
-    speakResult(
-      speakButton
-    );
-
-  }
-);
-
-
-/* =====================================================
-   STOP SPEECH ON EXIT
-===================================================== */
-
-window.addEventListener(
-  "beforeunload",
-  function() {
-
-    if (
-      "speechSynthesis" in window
-    ) {
-
-      speechSynthesis.cancel();
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   READY
-===================================================== */
-
-console.log(
-  "CropPilot is ready."
-);
-
-</script>
+<script type="module" src="app.js"></script>
 
 </body>
 
