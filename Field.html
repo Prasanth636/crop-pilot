@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  name="theme-color"
+  content="#008f3d"
+>
+
+<meta
+  name="description"
+  content="CropPilot field intelligence"
+>
+
+<title>CropPilot — Field Intelligence</title>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+
+<body>
+
+<a class="skip-link" href="#main">
+  Skip to main content
+</a>
+
+
+<div class="app">
+
+
+<header class="hero">
+
+  <div class="top">
+
+    <a href="index.html" class="brand">
+      <span aria-hidden="true">🌱</span> CropPilot
+    </a>
+
+    <button
+      id="themeButton"
+      class="theme-button"
+      type="button"
+      aria-label="Switch theme"
+    >
+      🌙
+    </button>
+
+  </div>
+
+  <div class="tagline">
+    Understand the conditions around your farm
+  </div>
+
+</header>
+
+
+<nav
+  class="main-nav"
+  aria-label="Main navigation"
+>
+
+  <a href="index.html">
+    <span aria-hidden="true">🏠</span> Dashboard
+  </a>
+
+  <a href="scan.html">
+    <span aria-hidden="true">📷</span> Scan
+  </a>
+
+  <a href="history.html">
+    <span aria-hidden="true">🗂️</span> History
+  </a>
+
+  <a
+    href="field.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">📍</span> Field
+  </a>
+
+  <a href="guide.html">
+    <span aria-hidden="true">📘</span> Guide
+  </a>
+
+</nav>
+
+
+<div
+  id="liveStatus"
+  class="sr-only"
+  aria-live="polite"
+></div>
+
+
+<main id="main" class="content">
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    FIELD INTELLIGENCE
+  </div>
+
+  <h1>
+    Your field conditions
+  </h1>
+
+  <p class="muted">
+    CropPilot uses weather and location
+    as supporting context for crop decisions.
+  </p>
+
+
+  <div class="location-card">
+
+    <div>
+
+      <strong>
+        <span aria-hidden="true">📍</span> Current location
+      </strong>
+
+      <div
+        id="farmLocation"
+        class="muted"
+      >
+        Detecting location...
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <strong>
+        <span aria-hidden="true">🌤️</span> Current temperature
+      </strong>
+
+      <div
+        id="weatherTemp"
+        class="muted"
+      >
+        --
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    LIVE WEATHER
+  </div>
+
+  <h2>
+    Field conditions
+  </h2>
+
+  <div class="stats">
+
+
+    <div class="stat">
+
+      <span>
+        Temperature
+      </span>
+
+      <strong id="temperature">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Humidity
+      </span>
+
+      <strong id="humidity">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Rain risk
+      </span>
+
+      <strong id="rain">
+        --
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <span>
+        Wind
+      </span>
+
+      <strong id="wind">
+        --
+      </strong>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    DECISION SUPPORT
+  </div>
+
+  <h2>
+    How field signals are used
+  </h2>
+
+
+  <div class="steps">
+
+
+    <div class="step">
+
+      <div class="step-number">
+        01
+      </div>
+
+      <strong>
+        Image first
+      </strong>
+
+      <p class="muted">
+        Visual evidence remains the primary
+        signal for crop analysis.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        02
+      </div>
+
+      <strong>
+        Weather second
+      </strong>
+
+      <p class="muted">
+        Weather provides supporting context,
+        not proof of disease.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        03
+      </div>
+
+      <strong>
+        Practical action
+      </strong>
+
+      <p class="muted">
+        The final advisory focuses on
+        safe, practical next steps.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <div class="step-number">
+        04
+      </div>
+
+      <strong>
+        Verify
+      </strong>
+
+      <p class="muted">
+        Important treatment decisions should
+        be checked with local guidance.
+      </p>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+<section class="card">
+
+  <div class="eyebrow">
+    NEXT STEP
+  </div>
+
+  <h2>
+    Ready to inspect a crop?
+  </h2>
+
+  <p class="muted">
+    Upload a clear crop photo and let
+    CropPilot combine it with these conditions.
+  </p>
+
+  <a
+    href="scan.html"
+    class="btn primary"
+  >
+    <span aria-hidden="true">📷</span> Start Crop Scan
+  </a>
+
+</section>
+
+
+</main>
+
+
+<footer class="footer">
+
+  <strong>
+    <span aria-hidden="true">🌱</span> CropPilot AI
+  </strong>
+
+  <p>
+    Weather data is supporting context only.
+  </p>
+
+  <p>
+    AI advice should be verified with
+    local agricultural guidance.
+  </p>
+
+</footer>
+
+
+<nav
+  class="mobile-nav"
+  aria-label="Mobile navigation"
+>
+
+  <a href="index.html">
+    <span aria-hidden="true">🏠</span>
+    <span>Home</span>
+  </a>
+
+  <a href="scan.html">
+    <span aria-hidden="true">📷</span>
+    <span>Scan</span>
+  </a>
+
+  <a href="history.html">
+    <span aria-hidden="true">🗂️</span>
+    <span>History</span>
+  </a>
+
+  <a
+    href="field.html"
+    class="active"
+    aria-current="page"
+  >
+    <span aria-hidden="true">📍</span>
+    <span>Field</span>
+  </a>
+
+</nav>
+
+
+</div>
+
+
+<script type="module" src="app.js"></script>
+
+</body>
+
+</html>
