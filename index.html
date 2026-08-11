@@ -1223,94 +1223,639 @@ async function getPlace(lat,lon){
 
 }
 
-
 /* ==========================================
    IMAGE CONVERSION
 ========================================== */
 
-function imageToBase64(file){
+function imageToBase64(file) {
 
-  return new Promise(
-    function(resolve,reject){
+  return new Promise(function(resolve, reject) {
 
-      const reader =
-        new FileReader();
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+
+      const img = new Image();
+
+      img.onload = function() {
+
+        const maxSize = 1600;
+
+        const scale = Math.min(
+          1,
+          maxSize / Math.max(
+            img.width,
+            img.height
+          )
+        );
+
+        const canvas =
+          document.createElement("canvas");
+
+        canvas.width = Math.max(
+          1,
+          Math.round(img.width * scale)
+        );
+
+        canvas.height = Math.max(
+          1,
+          Math.round(img.height * scale)
+        );
+
+        const ctx =
+          canvas.getContext("2d");
+
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        resolve(
+          canvas.toDataURL(
+            "image/jpeg",
+            0.82
+          )
+        );
+
+      };
+
+      img.onerror = function() {
+
+        reject(
+          new Error(
+            "Could not process the image."
+          )
+        );
+
+      };
+
+      img.src = event.target.result;
+
+    };
+
+    reader.onerror = function() {
+
+      reject(
+        new Error(
+          "Could not read the selected photo."
+        )
+      );
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+}
 
 
-      reader.onload =
-        function(event){
+/* ==========================================
+   ANALYZE CROP
+========================================== */
 
-          const img =
-            new Image();
-
-
-          img.onload =
-            function(){
-
-              const max =
-                1600;
+analyzeButton.addEventListener(
+  "click",
+  analyzeCrop
+);
 
 
-              const scale =
-                Math.min(
-                  1,
-                  max /
-                  Math.max(
-                    img.width,
-                    img.height
-                  )
-                );
+async function analyzeCrop() {
+
+  if (!selectedFile) {
+
+    alert(
+      "Please select a crop photo first."
+    );
+
+    return;
+
+  }
 
 
-              const canvas =
-                document.createElement(
-                  "canvas"
-                );
+  analyzeButton.disabled = true;
+
+  analyzeButton.textContent =
+    "⏳ Analyzing...";
 
 
-              canvas.width =
-                Math.max(
-                  1,
-                  Math.round(
-                    img.width * scale
-                  )
-                );
+  result.innerHTML = `
+
+    <div class="result-title">
+      🔎 Preparing crop analysis...
+    </div>
+
+    <div class="sub">
+      Processing your crop image.
+    </div>
+
+    <div class="progress">
+
+      <div
+        class="progress-bar"
+        style="width:30%">
+      </div>
+
+    </div>
+
+  `;
 
 
-              canvas.height =
-                Math.max(
-                  1,
-                  Math.round(
-                    img.height * scale
-                  )
-                );
+  try {
+
+    const image =
+      await imageToBase64(
+        selectedFile
+      );
 
 
-              const ctx =
-                canvas.getContext("2d");
+    const payload = {
+
+      image: image,
+
+      crop:
+        document.getElementById(
+          "crop"
+        ).value,
+
+      language:
+        document.getElementById(
+          "language"
+        ).value,
+
+      location:
+        field.place,
+
+      weather: {
+
+        temperature:
+          field.temperature,
+
+        humidity:
+          field.humidity,
+
+        rainRisk:
+          field.rain,
+
+        wind:
+          field.wind
+
+      }
+
+    };
 
 
-              ctx.drawImage(
-                img,
-                0,
-                0,
-                canvas.width,
-                canvas.height
-              );
+    const response =
+      await fetch(
+        "/api/analyze",
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+          body:
+            JSON.stringify(payload)
+
+        }
+      );
 
 
-              resolve(
-                canvas.toDataURL(
-                  "image/jpeg",
-                  .82
-                )
-              );
-
-            };
+    const data =
+      await response.json();
 
 
-          img.onerror =
-            function(){
+    if (!response.ok) {
 
-              reject(
-                n
+      throw new Error(
+        data.error ||
+        "AI analysis failed."
+      );
+
+    }
+
+
+    showResult(data);
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "CropPilot analysis:",
+      error
+    );
+
+
+    result.innerHTML = `
+
+      <div class="result-title">
+        ⚙️ AI analysis is not connected yet
+      </div>
+
+      <div class="sub">
+        ${escapeHTML(error.message)}
+      </div>
+
+      <br>
+
+      <div class="sub">
+        Your crop photo was selected
+        successfully. Add GEMINI_API_KEY
+        in Vercel to activate AI diagnosis.
+      </div>
+
+    `;
+
+  }
+
+  finally {
+
+    analyzeButton.disabled = false;
+
+    analyzeButton.textContent =
+      "🔍 Analyze My Crop";
+
+  }
+
+}
+
+
+/* ==========================================
+   SHOW AI RESULT
+========================================== */
+
+function showResult(data) {
+
+  currentResult = data;
+
+
+  const confidence =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(data.confidence) || 0
+      )
+    );
+
+
+  const severity =
+    String(
+      data.severity ||
+      "moderate"
+    ).toLowerCase();
+
+
+  let badgeClass = "warn";
+
+
+  if (
+    severity === "healthy" ||
+    severity === "low"
+  ) {
+
+    badgeClass = "good";
+
+  }
+
+
+  if (
+    severity === "high" ||
+    severity === "severe"
+  ) {
+
+    badgeClass = "bad";
+
+  }
+
+
+  result.innerHTML = `
+
+    <span class="badge ${badgeClass}">
+      ${escapeHTML(
+        severity.toUpperCase()
+      )}
+    </span>
+
+
+    <div class="result-title">
+
+      ${escapeHTML(
+        data.diagnosis ||
+        "Crop condition detected"
+      )}
+
+    </div>
+
+
+    <div class="sub">
+
+      ${escapeHTML(
+        data.summary ||
+        ""
+      )}
+
+    </div>
+
+
+    <div class="progress">
+
+      <div
+        id="progressBar"
+        class="progress-bar">
+      </div>
+
+    </div>
+
+
+    <div
+      class="sub"
+      style="margin-top:7px">
+
+      Confidence:
+      ${confidence}%
+
+    </div>
+
+
+    <div class="advice">
+
+
+      <div
+        class="advice-box green-border">
+
+        <strong>
+          🌱 What to do now
+        </strong>
+
+        <br>
+
+        <span class="sub">
+
+          ${escapeHTML(
+            data.action ||
+            "Follow local agricultural guidance."
+          )}
+
+        </span>
+
+      </div>
+
+
+      <div
+        class="advice-box danger">
+
+        <strong>
+
+          ${
+            data.spray_now === false
+            ? "🚫 Don't spray now"
+            : "🧪 Treatment guidance"
+          }
+
+        </strong>
+
+        <br>
+
+        <span class="sub">
+
+          ${escapeHTML(
+            data.treatment ||
+            "Follow locally approved treatment guidance."
+          )}
+
+        </span>
+
+      </div>
+
+
+      <div
+        class="advice-box green-border">
+
+        <strong>
+          💡 Why CropPilot thinks this
+        </strong>
+
+        <br>
+
+        <span class="sub">
+
+          ${escapeHTML(
+            data.reason ||
+            "Visual symptoms were considered."
+          )}
+
+        </span>
+
+      </div>
+
+
+      <div
+        class="advice-box green-border">
+
+        <strong>
+          🕒 Recommended action window
+        </strong>
+
+        <br>
+
+        <span class="sub">
+
+          ${escapeHTML(
+            data.action_window ||
+            "Check weather before treatment."
+          )}
+
+        </span>
+
+      </div>
+
+
+    </div>
+
+  `;
+
+
+  const progressBar =
+    document.getElementById(
+      "progressBar"
+    );
+
+
+  if (progressBar) {
+
+    progressBar.style.width =
+      confidence + "%";
+
+  }
+
+}
+
+
+/* ==========================================
+   ESCAPE HTML
+========================================== */
+
+function escapeHTML(text) {
+
+  return String(
+    text || ""
+  ).replace(
+    /[&<>"']/g,
+    function(char) {
+
+      const map = {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      };
+
+      return map[char];
+
+    }
+  );
+
+}
+
+
+/* ==========================================
+   VOICE ADVISORY
+========================================== */
+
+function speakResult() {
+
+  if (!currentResult) {
+
+    alert(
+      "Analyze a crop first."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !("speechSynthesis" in window)
+  ) {
+
+    alert(
+      "Voice is not supported by this browser."
+    );
+
+    return;
+
+  }
+
+
+  speechSynthesis.cancel();
+
+
+  const language =
+    document.getElementById(
+      "language"
+    ).value;
+
+
+  const languageMap = {
+
+    English: "en-IN",
+
+    Telugu: "te-IN",
+
+    Hindi: "hi-IN",
+
+    Tamil: "ta-IN",
+
+    Kannada: "kn-IN"
+
+  };
+
+
+  const text = [
+
+    currentResult.diagnosis,
+
+    currentResult.summary,
+
+    "What to do now: " +
+      currentResult.action,
+
+    currentResult.treatment,
+
+    "Recommended action window: " +
+      currentResult.action_window
+
+  ]
+  .filter(Boolean)
+  .join(". ");
+
+
+  const utterance =
+    new SpeechSynthesisUtterance(
+      text
+    );
+
+
+  utterance.lang =
+    languageMap[language] ||
+    "en-IN";
+
+
+  utterance.rate = 0.9;
+
+  utterance.pitch = 1;
+
+
+  speechSynthesis.speak(
+    utterance
+  );
+
+}
+
+
+/* ==========================================
+   VOICE BUTTONS
+========================================== */
+
+document.getElementById(
+  "voiceButton"
+).addEventListener(
+  "click",
+  speakResult
+);
+
+
+document.getElementById(
+  "speakButton"
+).addEventListener(
+  "click",
+  speakResult
+);
+
+
+/* ==========================================
+   FINISHED
+========================================== */
+
+console.log(
+  "CropPilot loaded successfully."
+);
+
+</script>
+
+</body>
+</html>
